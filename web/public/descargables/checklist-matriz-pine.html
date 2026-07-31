@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checklist Matriz PINE · Evolución Salud</title>
+  <style>
+    :root {
+      --brand: #0d9488;
+      --brand-dark: #134e4a;
+      --ink: #1e293b;
+      --muted: #64748b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--ink);
+      margin: 0;
+      background: #f8fafc;
+      line-height: 1.55;
+    }
+    .page {
+      max-width: 820px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 48px 40px;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 4px solid var(--brand);
+      padding-bottom: 20px;
+    }
+    .brand {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--brand-dark);
+      letter-spacing: -0.02em;
+    }
+    .brand small {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--brand);
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #fff;
+      background: var(--brand);
+      border-radius: 999px;
+      padding: 8px 14px;
+      white-space: nowrap;
+    }
+    h1 {
+      font-size: 26px;
+      line-height: 1.2;
+      margin: 28px 0 8px;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+    .intro {
+      font-size: 14px;
+      color: var(--muted);
+      margin: 0 0 24px;
+      max-width: 640px;
+    }
+    .section {
+      margin-top: 24px;
+    }
+    .section h2 {
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--brand-dark);
+      border-left: 4px solid var(--brand);
+      padding-left: 12px;
+      margin: 0 0 12px;
+    }
+    ul.items { list-style: none; margin: 0; padding: 0; }
+    ul.items li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #eef2f7;
+      font-size: 14px;
+    }
+    ul.items li:last-child { border-bottom: none; }
+    .box {
+      width: 22px;
+      height: 22px;
+      border: 2px solid #cbd5e1;
+      border-radius: 6px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .note {
+      margin-top: 28px;
+      padding: 16px 18px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 12px;
+      font-size: 12.5px;
+      color: #7c2d12;
+    }
+    .footer {
+      margin-top: 28px;
+      padding-top: 16px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+    .print-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      border: none;
+      border-radius: 999px;
+      background: var(--brand);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 12px 20px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(13, 148, 136, 0.35);
+    }
+    @media print {
+      body { background: #fff; }
+      .page { max-width: 100%; padding: 24px; }
+      .print-btn { display: none; }
+      @page { size: A4; margin: 14mm; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="brand">
+        Evolución Salud
+        <small>Líderes en PINE</small>
+      </div>
+      <span class="badge">Checklist gratuito</span>
+    </header>
+
+    <h1>Checklist Matriz PINE de Autorreconocimiento</h1>
+    <p class="intro">
+      Las primeras 72 horas después de un diagnóstico o ante una cirugía
+      programada son un momento de alta activación. Este checklist te ayuda a
+      registrar cómo estás, organizar tu red y preparar tu cuerpo y tu mente.
+      Completalo en familia, cada persona con su propia copia.
+    </p>
+
+    <div class="section">
+      <h2>1 · Registrá tu estado actual</h2>
+      <ul class="items">
+        <li><span class="box"></span>Hago una pausa y registro mis sensaciones físicas (tensión, nudo en el estómago, insomnio, palpitaciones).</li>
+        <li><span class="box"></span>Identifico qué emoción predomina: miedo, confusión, enojo, tristeza o sensación de descontrol.</li>
+        <li><span class="box"></span>Anoto cómo estuvo mi sueño las últimas 3 noches y qué horarios estoy manejando.</li>
+        <li><span class="box"></span>Observo mi alimentación: ¿estoy comiendo a horario? ¿hidratándome?</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>2 · Bajá la activación</h2>
+      <ul class="items">
+        <li><span class="box"></span>Practico 5 minutos de respiración vagal (inhalo 4 segundos, exhalo lento 6 a 8 segundos) dos veces al día.</li>
+        <li><span class="box"></span>Bajo las pantallas y las luces brillantes después de las 22 h.</li>
+        <li><span class="box"></span>Salgo a caminar 15-20 minutos al aire libre, de día si es posible.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>3 · Organizá el ambioma</h2>
+      <ul class="items">
+        <li><span class="box"></span>Escribo las dudas médicas para la próxima consulta (preguntas puntuales, en papel).</li>
+        <li><span class="box"></span>Elijo a 2-3 personas de confianza para delegar (turnos, casa, trámites).</li>
+        <li><span class="box"></span>Defino con mi familia qué límites de visitas y contactos necesito al regresar al hogar.</li>
+        <li><span class="box"></span>Coordinamos quién acompaña en el sanatorio y quién cubre la casa durante la cirugía.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>4 · Prepará la recuperación</h2>
+      <ul class="items">
+        <li><span class="box"></span>Priorizo alimentos antiinflamatorios: verduras, frutas, buena hidratación; reduzco ultraprocesados.</li>
+        <li><span class="box"></span>Confirmo con el equipo médico cómo será cada etapa y anoto las respuestas.</li>
+        <li><span class="box"></span>Me comprometo a sostener un horario de sueño fijo, también en la internación.</li>
+      </ul>
+    </div>
+
+    <div class="note">
+      <strong>¿Qué sigue?</strong> Este registro es tu punto de partida. Si
+      querés profundizar, la Guía PINE «El Día Después del Diagnóstico» te
+      acompaña paso a paso con herramientas de regulación emocional,
+      cronobiología, nutrición y organización del ambioma familiar. Cada
+      persona hace su propio proceso: completá tu Matriz PINE en
+      evolucionsalud.com/cuestionario para recibir tus recomendaciones
+      personalizadas.
+    </div>
+
+    <div class="footer">
+      <span>© Evolución Salud · Córdoba, Argentina · profesionales@evolucionsalud.com</span>
+      <span>Este material es de carácter psicoeducativo y no reemplaza la consulta con un profesional de la salud.</span>
+    </div>
+  </div>
+
+  <button class="print-btn" onclick="window.print()">Imprimir / guardar PDF</button>
+</body>
+</html>

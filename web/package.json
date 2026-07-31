@@ -1,0 +1,41 @@
+{
+  "name": "evolucion-salud-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Plataforma web de Evolución Salud — Next.js + TypeScript + TailwindCSS + Supabase",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:sync-catalog": "tsx scripts/sync-catalog.mts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.4",
+    "@supabase/supabase-js": "^2.48.1",
+    "framer-motion": "^12.43.0",
+    "gray-matter": "^4.0.3",
+    "lucide-react": "^0.474.0",
+    "marked": "^18.0.7",
+    "next": "^15.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.10.7",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.23.1",
+    "typescript": "^5.7.3",
+    "vitest": "^4.1.10"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "sharp@0.34.5": true
+  }
+}

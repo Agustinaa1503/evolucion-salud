@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /carrito
+Disallow: /checkout
+
+Sitemap: https://evolucionsalud.com/sitemap.xml

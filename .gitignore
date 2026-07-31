@@ -1,0 +1,37 @@
+# ============================================================
+# .gitignore — Evolución Salud
+# POLÍTICA DE SEGURIDAD: nunca versionar claves, .env, .md
+# ni contenido sensible.
+# ============================================================
+
+# --- SECRETOS Y VARIABLES DE ENTORNO ---
+# Nunca subir .env, .env.local, .env.example ni ninguna variante.
+.env*
+
+# --- SUPABASE CLI / TEMP (refs y estado local del proyecto) ---
+**/.temp/
+**/.branches/
+
+# --- LOGS (pueden contener datos de usuarios o depuración) ---
+*.log
+
+# --- MARKDOWN (contenido estratégico/clínico) ---
+# Política de seguridad: los archivos .md no se versionan.
+*.md
+
+# --- NODE / NEXT ---
+node_modules/
+.next/
+out/
+build/
+
+# --- TYPESCRIPT / NEXT ---
+*.tsbuildinfo
+next-env.d.ts
+
+# --- SISTEMA / EDITOR ---
+.DS_Store
+Thumbs.db
+*.pem
+.idea/
+.vscode/
