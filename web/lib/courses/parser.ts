@@ -229,8 +229,19 @@ const parseQuestions = (v: unknown): QuizQuestion[] => {
           : undefined,
       url: asString(o.url) || undefined,
       urlLabel: asString(o.urlLabel) || undefined,
+      correct: parseCorrect(o.correct),
     };
   }).filter((x): x is QuizQuestion => x !== null);
+};
+
+/** Respuesta correcta: string, número o lista de opciones (FASE 6). */
+const parseCorrect = (v: unknown): string | string[] | number | undefined => {
+  if (typeof v === 'number' || typeof v === 'string') return v;
+  if (Array.isArray(v)) {
+    const items = v.map((x) => asString(x)).filter(Boolean);
+    return items.length ? items : undefined;
+  }
+  return undefined;
 };
 
 const parseQuiz = (v: unknown): Quiz | undefined => {
@@ -241,10 +252,17 @@ const parseQuiz = (v: unknown): Quiz | undefined => {
   const o = asObject(v);
   const questions = parseQuestions(o.questions ?? o.items);
   if (!questions.length) return undefined;
+  const thresholdRaw = asString(o.passThreshold ?? o.pass_threshold);
   return {
     title: asString(o.title) || undefined,
     description: asString(o.description) || undefined,
     ctaLabel: asString(o.ctaLabel) || undefined,
+    passThreshold:
+      typeof o.passThreshold === 'number'
+        ? o.passThreshold
+        : thresholdRaw !== ''
+          ? Number(thresholdRaw)
+          : undefined,
     questions,
   };
 };

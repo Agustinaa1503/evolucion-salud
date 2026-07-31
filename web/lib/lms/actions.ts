@@ -1,6 +1,9 @@
 'use server';
 
 import { createServerSupabaseClient, getAuthSession } from '@/lib/auth/session';
+import { getCourse } from '@/lib/courses/registry';
+import { isScoredQuiz, scoreQuiz, type QuizAnswer, type QuizAttemptResult } from './quiz';
+import type { Json } from '@/lib/supabase/types';
 import {
   computeProgressPct,
   isVideoCompleted,
@@ -323,4 +326,138 @@ export async function markNotificationRead(notificationId: string): Promise<{ ok
     .eq('user_id', session.user.id);
   if (error) return { ok: false, error: error.message };
   return { ok: true };
+}
+
+/* -------------------------------------------------------------------------- */
+/* FASE 6 · Cuestionarios con nota e intentos                                  */
+/* -------------------------------------------------------------------------- */
+
+export type QuizSubmitResult = {
+  ok: boolean;
+  authed?: boolean;
+  error?: string;
+  result?: QuizAttemptResult;
+};
+
+export type QuizAttemptRow = {
+  id: string;
+  score: number | null;
+  max_score: number | null;
+  passed: boolean | null;
+  submitted_at: string;
+};
+
+/** Al aprobar el cuestionario completa las lecciones de tipo `quiz` del curso. */
+async function completeQuizLessons(
+  supabase: Supabase,
+  userId: string,
+  courseId: string,
+  courseSlug: string
+): Promise<void> {
+  const course = getCourse(courseSlug);
+  if (!course) return;
+
+  for (const module of course.modules ?? []) {
+    for (const lesson of module.lessons ?? []) {
+      if (lesson.type !== 'quiz') continue;
+      const lessonId = await resolveLessonId(supabase, courseId, lesson.id);
+      if (!lessonId) continue;
+      const now = nowIso();
+      await supabase.from('user_lesson_progress').upsert(
+        {
+          user_id: userId,
+          course_id: courseId,
+          lesson_id: lessonId,
+          status: 'completed',
+          viewed_at: now,
+          completed_at: now,
+        },
+        { onConflict: 'user_id,lesson_id' }
+      );
+    }
+  }
+
+  await recomputeCourseProgress(supabase, userId, courseId);
+}
+
+/**
+ * Envía un intento de cuestionario con nota. La puntuación se calcula en el
+ * servidor contra el Markdown (fuente de verdad), no se confía en el cliente.
+ */
+export async function submitQuizAttempt(
+  courseSlug: string,
+  answers: Record<string, QuizAnswer>
+): Promise<QuizSubmitResult> {
+  const session = await getAuthSession();
+  if (!session.user) {
+    return { ok: false, authed: false, error: 'Debe iniciar sesión para guardar su nota.' };
+  }
+
+  const course = getCourse(courseSlug);
+  const quiz = course?.quiz;
+  if (!quiz || !isScoredQuiz(quiz)) {
+    return { ok: false, error: 'Este curso no tiene un cuestionario con nota.' };
+  }
+
+  const result = scoreQuiz(quiz, answers);
+  const supabase = await createServerSupabaseClient();
+  const courseId = await resolveCourseId(supabase, courseSlug);
+  if (!courseId) return { ok: false, error: 'Curso no encontrado.' };
+
+  try {
+    await ensureEnrollment(supabase, session.user.id, courseId);
+
+    const { data: quizRow } = await supabase
+      .from('course_quizzes')
+      .select('id')
+      .eq('course_id', courseId)
+      .order('position', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+
+    const { error } = await supabase.from('user_quiz_attempts').insert({
+      user_id: session.user.id,
+      course_id: courseId,
+      quiz_id: quizRow?.id ?? null,
+      answers: answers as unknown as Json,
+      score: result.score,
+      max_score: result.maxScore,
+      passed: result.passed,
+    });
+    if (error) throw new Error(error.message);
+
+    if (result.passed) {
+      await completeQuizLessons(supabase, session.user.id, courseId, courseSlug);
+      await supabase.from('notifications').insert({
+        user_id: session.user.id,
+        type: 'quiz',
+        title: 'Cuestionario aprobado',
+        body: `Aprobó el cuestionario de «${course.title}» con ${result.score}/${result.maxScore}.`,
+        link: `/cursos/${courseSlug}`,
+      });
+    }
+
+    return { ok: true, authed: true, result };
+  } catch (error) {
+    return { ok: false, authed: true, error: error instanceof Error ? error.message : 'Error al guardar la nota.' };
+  }
+}
+
+/** Últimos intentos del usuario sobre el cuestionario del curso. */
+export async function getQuizAttempts(courseSlug: string): Promise<QuizAttemptRow[]> {
+  const session = await getAuthSession();
+  if (!session.user) return [];
+
+  const supabase = await createServerSupabaseClient();
+  const courseId = await resolveCourseId(supabase, courseSlug);
+  if (!courseId) return [];
+
+  const { data } = await supabase
+    .from('user_quiz_attempts')
+    .select('id, score, max_score, passed, submitted_at')
+    .eq('user_id', session.user.id)
+    .eq('course_id', courseId)
+    .order('submitted_at', { ascending: false })
+    .limit(5);
+  return data ?? [];
 }

@@ -125,7 +125,7 @@ async function syncQuiz(sb: typeof import('@supabase/supabase-js').default, cour
       title: quiz.title ?? null,
       description: quiz.description ?? null,
       cta_label: quiz.ctaLabel ?? null,
-      pass_threshold: 60,
+      pass_threshold: quiz.passThreshold ?? 60,
     };
 
     if (quizId) {
@@ -160,7 +160,7 @@ async function syncQuiz(sb: typeof import('@supabase/supabase-js').default, cour
         label: question.label,
         options: question.options ?? [],
         scale: question.scale ?? null,
-        correct: null,
+        correct: question.correct ?? null,
         placeholder: question.placeholder ?? null,
         url: question.url ?? null,
         url_label: question.urlLabel ?? null,

@@ -115,12 +115,19 @@ export type QuizQuestion = {
   scale?: QuizScale;
   url?: string;
   urlLabel?: string;
+  /**
+   * Respuesta correcta (solo en cuestionarios con nota, FASE 6).
+   * string: radio/select/texto · string[]: checkbox · number: escala.
+   */
+  correct?: string | string[] | number;
 };
 
 export type Quiz = {
   title?: string;
   description?: string;
   ctaLabel?: string;
+  /** Porcentaje mínimo para aprobar (0-100). Por defecto 60. */
+  passThreshold?: number;
   questions: QuizQuestion[];
 };
 
@@ -240,3 +247,22 @@ export const isUpcomingCourse = (course: Course): boolean =>
 /** Cantidad total de lecciones del curso (todos los módulos). */
 export const countLessons = (course: Course): number =>
   course.modules.reduce((total, m) => total + (m.lessons?.length ?? 0), 0);
+
+/* ---------- Cuestionarios con nota (FASE 6) ---------- */
+
+/** Una pregunta participa de la nota si define `correct`. */
+export const isScoredQuestion = (q: QuizQuestion): boolean =>
+  q.correct !== undefined && q.correct !== null;
+
+/** El cuestionario tiene nota si define umbral o alguna pregunta puntuable. */
+export const isScoredQuiz = (quiz?: Quiz | null): boolean =>
+  Boolean(
+    quiz && (quiz.passThreshold !== undefined || quiz.questions.some(isScoredQuestion))
+  );
+
+/** Preguntas que suman a la nota del cuestionario. */
+export const scoredQuestions = (quiz: Quiz): QuizQuestion[] =>
+  quiz.questions.filter(isScoredQuestion);
+
+/** Máxima nota posible del cuestionario (1 punto por pregunta puntuable). */
+export const quizMaxScore = (quiz: Quiz): number => scoredQuestions(quiz).length;
