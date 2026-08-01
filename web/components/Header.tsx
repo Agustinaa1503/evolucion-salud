@@ -23,6 +23,7 @@ import { useAuth } from '@/components/auth/AuthProvider';
 const nav = [
   { href: '/', label: 'Inicio' },
   { href: '/cursos', label: 'Cursos' },
+  { href: '/biblioteca', label: 'Catálogo' },
   { href: '/tienda', label: 'Tienda' },
   { href: '/cuestionario', label: 'Cuestionario' },
   { href: '/podcast', label: 'Podcast' },

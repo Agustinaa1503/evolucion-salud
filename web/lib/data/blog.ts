@@ -9,6 +9,14 @@ export type BlogPost = {
   excerpt: string;
   date: string;
   category: string;
+  /** Slugs de categorías de la taxonomía (FASE 10). */
+  categories?: string[];
+  /** Tags libres (FASE 10). */
+  tags?: string[];
+  /** Nivel de la taxonomía (FASE 10). */
+  level?: string;
+  /** Audiencias de la taxonomía (FASE 10). */
+  audience?: string[];
   readTime: string;
   icon: string;
   gradient: string;
@@ -25,6 +33,10 @@ export const blogPosts: BlogPost[] = [
       'La espera previa a una cirugía activa tu sistema de alerta. Te contamos qué pasa en tu cuerpo y qué puedes hacer para llegar más regulado al quirófano.',
     date: '2026-07-28',
     category: 'Preparación quirúrgica',
+    categories: ['estres', 'ansiedad', 'sueno'],
+    tags: ['estrés prequirúrgico', 'cortisol', 'melatonina', 'respiración vagal'],
+    level: 'introductorio',
+    audience: ['publico-general'],
     readTime: '8 min',
     icon: 'heart',
     gradient: 'from-brand-500 to-leaf-600',
@@ -70,6 +82,10 @@ export const blogPosts: BlogPost[] = [
       'El estrés no es el enemigo: la carga acumulada sí. Aprende a reconocer el desgaste silencioso de tu cuerpo antes de que se convierta en enfermedad.',
     date: '2026-07-21',
     category: 'PINE',
+    categories: ['estres', 'estres-cronico', 'pine'],
+    tags: ['carga alostática', 'alostasis', 'cortisol', 'estrategias de regulación'],
+    level: 'inicial',
+    audience: ['publico-general'],
     readTime: '7 min',
     icon: 'waves',
     gradient: 'from-sky-500 to-indigo-600',
@@ -114,6 +130,10 @@ export const blogPosts: BlogPost[] = [
       'La melatonina es mucho más que la «hormona del sueño». Te contamos su rol en la recuperación y qué hábitos la protegen.',
     date: '2026-07-14',
     category: 'Sueño y descanso',
+    categories: ['sueno', 'cronobiologia'],
+    tags: ['melatonina', 'sueño', 'recuperación', 'higiene del sueño'],
+    level: 'introductorio',
+    audience: ['publico-general'],
     readTime: '6 min',
     icon: 'moon',
     gradient: 'from-violet-500 to-purple-700',
@@ -159,6 +179,10 @@ export const blogPosts: BlogPost[] = [
       'Luz, comidas, descanso y actividad: tu cuerpo sigue un ritmo de aproximadamente 24 horas. Alinearte con él puede cambiar tu recuperación.',
     date: '2026-07-07',
     category: 'Cronobiología',
+    categories: ['cronobiologia', 'sueno'],
+    tags: ['cronobiología', 'ritmo circadiano', 'melatonina', 'luz'],
+    level: 'inicial',
+    audience: ['publico-general'],
     readTime: '7 min',
     icon: 'clock',
     gradient: 'from-amber-500 to-orange-600',
@@ -204,6 +228,10 @@ export const blogPosts: BlogPost[] = [
       'La craneotomía con paciente despierto suena aterradora, pero es una de las técnicas más precisas para proteger el cerebro. Te la explicamos simple.',
     date: '2026-06-30',
     category: 'Neurocirugía',
+    categories: ['neurociencias', 'profesionales-de-la-salud'],
+    tags: ['cirugía despierta', 'mapeo cortical', 'neuropsicología', 'quirófano'],
+    level: 'intermedio',
+    audience: ['profesionales-de-la-salud', 'psicologos'],
     readTime: '9 min',
     icon: 'brain',
     gradient: 'from-leaf-500 to-leaf-800',
@@ -247,6 +275,10 @@ export const blogPosts: BlogPost[] = [
       'Quien acompaña también acumula carga alostática. Aprende a reconocer las señales y a sostenerte sin culpa.',
     date: '2026-06-23',
     category: 'Ambioma familiar',
+    categories: ['estres', 'emociones', 'relaciones-interpersonales'],
+    tags: ['cuidador', 'ambioma', 'carga alostática', 'límites'],
+    level: 'inicial',
+    audience: ['publico-general'],
     readTime: '7 min',
     icon: 'heart',
     gradient: 'from-pink-500 to-rose-600',

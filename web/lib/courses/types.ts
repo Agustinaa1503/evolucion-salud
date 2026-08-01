@@ -202,6 +202,8 @@ export type Course = {
   duration?: string;
   level?: string;
   difficulty?: string;
+  /** Tags libres de clasificación (FASE 10, alimentan la taxonomía). */
+  tags: string[];
   type: CourseType;
   status: CourseStatus;
   visibility: CourseVisibility;

@@ -7,6 +7,14 @@ export type Episode = {
   embedUrl?: string | null;
   spotifyUrl?: string;
   youtubeUrl?: string;
+  /** Slugs de categorías de la taxonomía (FASE 10). */
+  categories?: string[];
+  /** Tags libres (FASE 10). */
+  tags?: string[];
+  /** Nivel de la taxonomía (FASE 10). */
+  level?: string;
+  /** Audiencias de la taxonomía (FASE 10). */
+  audience?: string[];
   icon: string;
   image: string;
   gradient: string;
@@ -33,6 +41,10 @@ export const podcast = {
       embedUrl: null,
       spotifyUrl: spotifySearch,
       youtubeUrl: youtubeSearch,
+      categories: ['pine', 'neurociencias'],
+      tags: ['pine', 'mente-cuerpo', 'sistemas PINE'],
+      level: 'introductorio',
+      audience: ['publico-general'],
       icon: 'brain',
       gradient: 'from-brand-500 to-leaf-600',
       image: "https://images.unsplash.com/photo-1590602847861-f357e9332bbc?auto=format&fit=crop&w=1600&q=80",
@@ -46,6 +58,10 @@ export const podcast = {
       embedUrl: null,
       spotifyUrl: spotifySearch,
       youtubeUrl: youtubeSearch,
+      categories: ['estres', 'estres-cronico'],
+      tags: ['carga alostática', 'alostasis', 'estrés crónico'],
+      level: 'inicial',
+      audience: ['publico-general'],
       icon: 'waves',
       gradient: 'from-sky-500 to-indigo-600',
       image: "https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1600&q=80",
@@ -59,6 +75,10 @@ export const podcast = {
       embedUrl: null,
       spotifyUrl: spotifySearch,
       youtubeUrl: youtubeSearch,
+      categories: ['sueno', 'cronobiologia'],
+      tags: ['melatonina', 'sueño', 'descanso', 'recuperación'],
+      level: 'introductorio',
+      audience: ['publico-general'],
       icon: 'moon',
       gradient: 'from-violet-500 to-purple-700',
       image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=1600&q=80",
@@ -72,6 +92,10 @@ export const podcast = {
       embedUrl: null,
       spotifyUrl: spotifySearch,
       youtubeUrl: youtubeSearch,
+      categories: ['neurociencias', 'profesionales-de-la-salud'],
+      tags: ['neuropsicología', 'mapeo cortical', 'quirófano', 'cirugía despierta'],
+      level: 'profesional',
+      audience: ['profesionales-de-la-salud', 'psicologos'],
       icon: 'stethoscope',
       gradient: 'from-leaf-500 to-leaf-800',
       image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1600&q=80",
@@ -85,6 +109,10 @@ export const podcast = {
       embedUrl: null,
       spotifyUrl: spotifySearch,
       youtubeUrl: youtubeSearch,
+      categories: ['cronobiologia', 'sueno'],
+      tags: ['cronobiología', 'ritmo circadiano', 'melatonina', 'luz'],
+      level: 'inicial',
+      audience: ['publico-general'],
       icon: 'clock',
       gradient: 'from-amber-500 to-orange-600',
       image: "https://images.unsplash.com/photo-1437482078695-73f5ca6c96e2?auto=format&fit=crop&w=1600&q=80",
@@ -98,6 +126,10 @@ export const podcast = {
       embedUrl: null,
       spotifyUrl: spotifySearch,
       youtubeUrl: youtubeSearch,
+      categories: ['estres', 'emociones'],
+      tags: ['cuidador', 'ambioma', 'estrategias de regulación'],
+      level: 'inicial',
+      audience: ['publico-general'],
       icon: 'heart',
       gradient: 'from-pink-500 to-rose-600',
       image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1600&q=80",

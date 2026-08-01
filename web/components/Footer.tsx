@@ -22,6 +22,7 @@ const navColumns = [
     links: [
       { href: '/', label: 'Inicio' },
       { href: '/cursos', label: 'Cursos y capacitaciones' },
+      { href: '/biblioteca', label: 'Catálogo' },
       { href: '/tienda', label: 'Tienda de guías' },
       { href: '/blog', label: 'Blog' },
       { href: '/nosotros', label: 'Sobre nosotros' },
@@ -35,6 +36,8 @@ const navColumns = [
       { href: '/cuestionario', label: 'Cuestionario Matriz PINE' },
       { href: '/newsletter', label: 'Newsletter semanal' },
       { href: '/podcast', label: 'Podcast' },
+      { href: '/categorias', label: 'Categorías' },
+      { href: '/tags', label: 'Etiquetas' },
       { href: '/carrito', label: 'Carrito' },
     ],
   },

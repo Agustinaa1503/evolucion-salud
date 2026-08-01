@@ -17,6 +17,12 @@ export type Product = {
   interval?: 'monthly';
   level: ProductLevel;
   badge?: string;
+  /** Slugs de categorías de la taxonomía (FASE 10). */
+  categories?: string[];
+  /** Tags libres (FASE 10). */
+  tags?: string[];
+  /** Audiencias de la taxonomía (FASE 10). */
+  audience?: string[];
   features: string[];
   includes: string[];
   icon: string;
@@ -46,6 +52,9 @@ export const products: Product[] = [
     price: 0,
     level: 'lead-magnet',
     badge: 'Gratis',
+    categories: ['autoconocimiento', 'pine', 'psicoeducacion'],
+    tags: ['checklist', 'autorreconocimiento', 'matriz pine'],
+    audience: ['publico-general'],
     features: [
       'Checklist de autorreconocimiento',
       'Registro de las primeras 72 horas',
@@ -65,6 +74,9 @@ export const products: Product[] = [
     price: 19,
     level: 'entrada',
     badge: 'Entrada',
+    categories: ['estres', 'sueno', 'nutricion', 'bienestar-integral'],
+    tags: ['diagnóstico', 'afrontamiento', 'regulación emocional', 'perioperatorio'],
+    audience: ['publico-general'],
     features: [
       'Capítulos 1-4 en PDF',
       'La biología de la incertidumbre',
@@ -88,6 +100,9 @@ export const products: Product[] = [
     level: 'media',
     badge: 'Más elegida',
     recommended: true,
+    categories: ['estres', 'psicoeducacion', 'profesionales-de-la-salud'],
+    tags: ['guía', 'meditaciones', 'quirófano', 'cuaderno de ruta'],
+    audience: ['publico-general', 'profesionales-de-la-salud'],
     features: [
       'Capítulos 1-6 en PDF',
       'Capítulo 5: el desafío del quirófano despierto',
@@ -110,6 +125,9 @@ export const products: Product[] = [
     compareAt: 110,
     level: 'alta',
     badge: 'Mejor valor',
+    categories: ['psicoeducacion', 'bienestar-integral'],
+    tags: ['bundle', 'guía', 'meditaciones', 'plantillas'],
+    audience: ['publico-general'],
     features: [
       'Guía Premium completa (caps. 1-6)',
       'Meditaciones guiadas',
@@ -131,6 +149,9 @@ export const products: Product[] = [
     price: 99,
     level: 'b2b',
     badge: 'Profesionales',
+    categories: ['profesionales-de-la-salud', 'formacion-profesional', 'neurociencias'],
+    tags: ['protocolo', 'neuropsicología', 'quirófano', 'mapeo cortical'],
+    audience: ['psicologos', 'medicos', 'profesionales-de-la-salud'],
     features: [
       'Protocolo de inserción en quirófano',
       'Diseño de pruebas personalizadas (lenguaje, motricidad, emociones)',
@@ -152,6 +173,9 @@ export const products: Product[] = [
     interval: 'monthly',
     level: 'recurrente',
     badge: 'Recurrente',
+    categories: ['pine', 'psicoeducacion', 'bienestar-integral'],
+    tags: ['membresía', 'biblioteca', 'comunidad'],
+    audience: ['publico-general'],
     features: [
       'Biblioteca digital PINE completa',
       'Material nuevo cada mes',
@@ -172,6 +196,9 @@ export const products: Product[] = [
     price: 9,
     level: 'extra',
     badge: 'Bolsillo',
+    categories: ['meditacion', 'respiracion', 'sueno'],
+    tags: ['meditación', 'respiración vagal', 'audios', 'relajación'],
+    audience: ['publico-general'],
     features: [
       '3 audios guiados',
       'Respiración vagal',
@@ -192,6 +219,9 @@ export const products: Product[] = [
     price: 12,
     level: 'extra',
     badge: 'Plantillas',
+    categories: ['estres', 'habitos-saludables', 'relaciones-interpersonales'],
+    tags: ['plantillas', 'ruta quirúrgica', 'organización familiar'],
+    audience: ['publico-general'],
     features: [
       'Dudas médicas organizadas',
       'Red de contención',

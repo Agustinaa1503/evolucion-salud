@@ -18,6 +18,7 @@ function makeCourse(overrides: Partial<Course>): Course {
     description: 'Un recorrido rápido por la PINE.',
     category: 'Salud',
     teachers: [],
+    tags: [],
     type: 'free',
     status: 'published',
     visibility: 'public',

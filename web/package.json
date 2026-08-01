@@ -9,7 +9,8 @@
     "start": "next start",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:sync-catalog": "tsx scripts/sync-catalog.mts"
+    "db:sync-catalog": "tsx scripts/sync-catalog.mts",
+    "db:sync-taxonomy": "tsx scripts/sync-taxonomy.mts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

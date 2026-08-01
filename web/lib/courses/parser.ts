@@ -506,6 +506,7 @@ export function parseCourseFile(filePath: string): Course {
     subtitle: asString(d.subtitle),
     description: asString(d.description),
     category: asString(d.category, 'PINE'),
+    tags: asStringArray(d.tags),
     author: asString(d.author) || undefined,
     teachers: parseTeachers(d.teachers ?? d.teacher ?? d.docentes),
     thumbnail: asString(d.thumbnail) || undefined,

@@ -56,6 +56,33 @@ export type Database = {
           },
         ]
       }
+      categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          group: string
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          group: string
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          group?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       certificates: {
         Row: {
           certificate_number: string
@@ -130,6 +157,64 @@ export type Database = {
           topic?: string | null
         }
         Relationships: []
+      }
+      content_categories: {
+        Row: {
+          category_slug: string
+          content_id: string
+          content_type: string
+          created_at: string
+        }
+        Insert: {
+          category_slug: string
+          content_id: string
+          content_type: string
+          created_at?: string
+        }
+        Update: {
+          category_slug?: string
+          content_id?: string
+          content_type?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_categories_category_slug_fkey"
+            columns: ["category_slug"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      content_tags: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          tag_slug: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          tag_slug: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          tag_slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_tags_tag_slug_fkey"
+            columns: ["tag_slug"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["slug"]
+          },
+        ]
       }
       course_lessons: {
         Row: {
@@ -819,6 +904,24 @@ export type Database = {
           created_at?: string
           descripcion?: string | null
           nombre?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          created_at: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          name?: string
           slug?: string
         }
         Relationships: []
