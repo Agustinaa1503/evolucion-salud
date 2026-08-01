@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.15"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       activity_logs: {
@@ -74,6 +49,51 @@ export type Database = {
           },
           {
             foreignKeyName: "activity_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      certificates: {
+        Row: {
+          certificate_number: string
+          course_id: string
+          created_at: string
+          id: string
+          issued_at: string
+          pdf_path: string | null
+          user_id: string
+        }
+        Insert: {
+          certificate_number: string
+          course_id: string
+          created_at?: string
+          id?: string
+          issued_at?: string
+          pdf_path?: string | null
+          user_id: string
+        }
+        Update: {
+          certificate_number?: string
+          course_id?: string
+          created_at?: string
+          id?: string
+          issued_at?: string
+          pdf_path?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificates_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -1050,7 +1070,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_certificate_public: {
+        Args: { p_id: string }
+        Returns: {
+          certificate_number: string
+          course_title: string
+          full_name: string
+          issued_at: string
+          valid: boolean
+        }[]
+      }
       is_admin: { Args: never; Returns: boolean }
+      issue_certificate: {
+        Args: { p_course_id: string; p_pdf_path: string; p_user_id: string }
+        Returns: {
+          certificate_number: string
+          id: string
+          issued_at: string
+        }[]
+      }
       log_activity: {
         Args: {
           p_course_id: string
@@ -1060,6 +1098,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      next_certificate_number: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
@@ -1188,9 +1227,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },

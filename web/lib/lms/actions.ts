@@ -4,6 +4,7 @@ import { createServerSupabaseClient, getAuthSession } from '@/lib/auth/session';
 import { getCourse } from '@/lib/courses/registry';
 import { countLessons } from '@/lib/courses/types';
 import { isScoredQuiz, scoreQuiz, type QuizAnswer, type QuizAttemptResult } from './quiz';
+import { buildCertificatePdf } from '@/lib/certificates/pdf';
 import type { Json } from '@/lib/supabase/types';
 import {
   computeProgressPct,
@@ -480,6 +481,7 @@ export type MyCourseEntry = {
   completedAt: string | null;
   totalLessons: number;
   completedLessons: number;
+  hasCertificate: boolean;
 };
 
 export type MyNotification = {
@@ -558,6 +560,7 @@ export async function getMyLearning(): Promise<MyLearningResult> {
       completedAt: enrolled.completed_at ?? null,
       totalLessons: catalog ? countLessons(catalog) : 0,
       completedLessons: completedByCourse.get(enrolled.course_id) ?? 0,
+      hasCertificate: Boolean(catalog?.hasCertificate),
     });
   }
 
@@ -585,4 +588,123 @@ export async function getMyLearning(): Promise<MyLearningResult> {
     notifications,
     unreadCount: notifications.filter((n) => !n.readAt).length,
   };
+}
+
+/* -------------------------------------------------------------------------- */
+/* FASE 5 · Certificados (PDF + QR + Storage)                                  */
+/* -------------------------------------------------------------------------- */
+
+export type CertificateResult = {
+  ok: boolean;
+  error?: string;
+  signedUrl?: string;
+  certificateNumber?: string;
+  issuedAt?: string;
+};
+
+const siteUrl = () => process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+
+/**
+ * Emite (si hace falta) y devuelve el enlace firmado del certificado PDF del
+ * curso. Requisitos: sesión iniciada, curso con `hasCertificate` publicado y
+ * curso completado (status `completed`). El PDF se genera en el servidor con
+ * pdf-lib + qrcode y se guarda en el bucket privado `certificates`.
+ */
+export async function getCourseCertificate(courseSlug: string): Promise<CertificateResult> {
+  const session = await getAuthSession();
+  if (!session.user) {
+    return { ok: false, error: 'Debe iniciar sesión para descargar su certificado.' };
+  }
+
+  const course = getCourse(courseSlug);
+  if (!course || !course.hasCertificate) {
+    return { ok: false, error: 'Este curso no emite certificados.' };
+  }
+  if (course.type === 'upcoming' || course.status === 'draft' || course.status === 'in-development') {
+    return { ok: false, error: 'El certificado estará disponible cuando el curso se lance.' };
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const courseId = await resolveCourseId(supabase, courseSlug);
+  if (!courseId) return { ok: false, error: 'Curso no encontrado.' };
+
+  const { data: enrollment } = await supabase
+    .from('user_courses')
+    .select('status')
+    .eq('user_id', session.user.id)
+    .eq('course_id', courseId)
+    .maybeSingle();
+
+  if (!enrollment || enrollment.status !== 'completed') {
+    return { ok: false, error: 'Complete todas las lecciones del curso para obtener su certificado.' };
+  }
+
+  const fullName = [session.profile?.nombre, session.profile?.apellido]
+    .filter(Boolean)
+    .join(' ')
+    .trim();
+  const studentName = fullName || session.user.email || 'Participante';
+  // La ruta dentro del bucket NO lleva el prefijo del bucket (la policy usa
+  // storage.foldername(name)[1] para chequear la carpeta <uid>/).
+  const pdfPath = `${session.user.id}/${courseId}.pdf`;
+
+  try {
+    const { data: certRows, error: certError } = await supabase
+      .rpc('issue_certificate', {
+        p_user_id: session.user.id,
+        p_course_id: courseId,
+        p_pdf_path: pdfPath,
+      });
+    const cert = certRows?.[0];
+    if (certError || !cert) {
+      return { ok: false, error: certError?.message ?? 'No se pudo emitir el certificado.' };
+    }
+
+    const verificationUrl = `${siteUrl()}/verificar/${cert.id}`;
+    const pdfBytes = await buildCertificatePdf({
+      fullName: studentName,
+      courseTitle: course.title,
+      certificateNumber: cert.certificate_number,
+      issuedAt: cert.issued_at,
+      verificationUrl,
+    });
+
+    const { error: uploadError } = await supabase.storage
+      .from('certificates')
+      .upload(pdfPath, pdfBytes, { contentType: 'application/pdf', upsert: true });
+    if (uploadError) return { ok: false, error: 'No se pudo guardar el certificado.' };
+
+    const { data: signed, error: signedError } = await supabase.storage
+      .from('certificates')
+      .createSignedUrl(pdfPath, 3600);
+    if (signedError || !signed) {
+      return { ok: false, error: 'No se pudo generar el enlace de descarga.' };
+    }
+
+    await supabase.from('notifications').insert({
+      user_id: session.user.id,
+      type: 'certificate',
+      title: 'Certificado disponible',
+      body: `Su certificado de «${course.title}» (${cert.certificate_number}) está listo para descargar.`,
+      link: `/cursos/${courseSlug}`,
+    });
+    await supabase.rpc('log_activity', {
+      p_user_id: session.user.id,
+      p_course_id: courseId,
+      p_event: 'certificate_issued',
+      p_payload: { certificate_number: cert.certificate_number },
+    });
+
+    return {
+      ok: true,
+      signedUrl: signed.signedUrl,
+      certificateNumber: cert.certificate_number,
+      issuedAt: cert.issued_at,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : 'Error al generar el certificado.',
+    };
+  }
 }
