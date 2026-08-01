@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import {
   ArrowRight,
   GraduationCap,
+  Heart,
   LogOut,
   Menu,
   Settings,
@@ -60,6 +61,7 @@ export default function Header() {
 
   const userLinks = [
     { href: '/mi-aprendizaje', label: 'Mi aprendizaje', icon: GraduationCap },
+    { href: '/mis-favoritos', label: 'Mis favoritos', icon: Heart },
     { href: '/profile', label: 'Mi perfil', icon: UserRound },
     { href: '/settings', label: 'Configuración', icon: Settings },
   ];

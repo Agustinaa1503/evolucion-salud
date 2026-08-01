@@ -6,6 +6,7 @@ import CourseStatus from './CourseStatus';
 import CourseMetadata from './CourseMetadata';
 import CourseCTA from './CourseCTA';
 import CourseTeacher from './CourseTeacher';
+import FavoriteButton from '@/components/FavoriteButton';
 import Icon from '@/components/Icon';
 import type { Course } from '@/lib/courses/types';
 
@@ -52,6 +53,9 @@ export default function CourseHero({ course }: { course: Course }) {
             <div className="absolute bottom-4 left-4 flex flex-wrap gap-2">
               <CourseBadge course={course} />
               <CourseStatus course={course} />
+            </div>
+            <div className="absolute right-4 top-4">
+              <FavoriteButton courseSlug={course.slug} />
             </div>
           </div>
 

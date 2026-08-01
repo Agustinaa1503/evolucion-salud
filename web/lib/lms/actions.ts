@@ -1,10 +1,13 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { createServerSupabaseClient, getAuthSession } from '@/lib/auth/session';
 import { getCourse } from '@/lib/courses/registry';
 import { countLessons } from '@/lib/courses/types';
+import type { Course } from '@/lib/courses/types';
 import { isScoredQuiz, scoreQuiz, type QuizAnswer, type QuizAttemptResult } from './quiz';
 import { buildCertificatePdf } from '@/lib/certificates/pdf';
+import { favoriteRowsToSlugs } from './favorites';
 import type { Json } from '@/lib/supabase/types';
 import {
   computeProgressPct,
@@ -707,4 +710,89 @@ export async function getCourseCertificate(courseSlug: string): Promise<Certific
       error: error instanceof Error ? error.message : 'Error al generar el certificado.',
     };
   }
+}
+
+/* -------------------------------------------------------------------------- */
+/* FASE 8 · Favoritos de cursos                                                */
+/* -------------------------------------------------------------------------- */
+
+export type ToggleFavoriteResult = {
+  ok: boolean;
+  authed?: boolean;
+  favorite?: boolean;
+  error?: string;
+};
+
+export type MyFavoritesResult = {
+  authed: boolean;
+  error?: string;
+  courses: Course[];
+};
+
+/** Marca/desmarca un curso como favorito del usuario. */
+export async function toggleFavorite(courseSlug: string): Promise<ToggleFavoriteResult> {
+  const session = await getAuthSession();
+  if (!session.user) {
+    return { ok: false, authed: false, error: 'Debe iniciar sesión para guardar favoritos.' };
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const courseId = await resolveCourseId(supabase, courseSlug);
+  if (!courseId) return { ok: false, error: 'Curso no encontrado.' };
+
+  const { data: existing } = await supabase
+    .from('user_favorites')
+    .select('course_id')
+    .eq('user_id', session.user.id)
+    .eq('course_id', courseId)
+    .maybeSingle();
+
+  if (existing) {
+    const { error } = await supabase
+      .from('user_favorites')
+      .delete()
+      .eq('user_id', session.user.id)
+      .eq('course_id', courseId);
+    if (error) return { ok: false, error: error.message };
+    revalidatePath('/mis-favoritos');
+    return { ok: true, authed: true, favorite: false };
+  }
+
+  const { error } = await supabase.from('user_favorites').insert({
+    user_id: session.user.id,
+    course_id: courseId,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath('/mis-favoritos');
+  return { ok: true, authed: true, favorite: true };
+}
+
+/** Slugs de los cursos favoritos del usuario (en orden de marcado, del más reciente). */
+export async function getFavoriteSlugs(): Promise<string[]> {
+  const session = await getAuthSession();
+  if (!session.user) return [];
+
+  const supabase = await createServerSupabaseClient();
+  const { data: rows } = await supabase
+    .from('user_favorites')
+    .select('course_id')
+    .eq('user_id', session.user.id)
+    .order('created_at', { ascending: false });
+
+  if (!rows?.length) return [];
+
+  const { data: catalog } = await supabase.from('courses').select('id, slug');
+  return favoriteRowsToSlugs(rows, catalog ?? []);
+}
+
+/** Cursos favoritos del usuario (detalle desde el catálogo Markdown, fuente de verdad). */
+export async function getMyFavorites(): Promise<MyFavoritesResult> {
+  const session = await getAuthSession();
+  if (!session.user) return { authed: false, courses: [] };
+
+  const slugs = await getFavoriteSlugs();
+  const courses = slugs
+    .map((slug) => getCourse(slug))
+    .filter((c): c is Course => Boolean(c));
+  return { authed: true, courses };
 }

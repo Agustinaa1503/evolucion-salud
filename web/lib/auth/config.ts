@@ -29,7 +29,13 @@ export const isProviderEnabled = (name: AuthProviderName): boolean =>
 export const AUTH_PAGES = ['/login', '/register', '/forgot-password', '/reset-password'];
 
 /** Rutas protegidas que requieren sesión. */
-export const PROTECTED_PAGES = ['/profile', '/settings', '/mi-aprendizaje', '/admin'];
+export const PROTECTED_PAGES = [
+  '/profile',
+  '/settings',
+  '/mi-aprendizaje',
+  '/mis-favoritos',
+  '/admin',
+];
 
 export const isProtectedPage = (pathname: string): boolean =>
   PROTECTED_PAGES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
