@@ -373,6 +373,39 @@ export type Database = {
           },
         ]
       }
+      course_waitlist: {
+        Row: {
+          course_slug: string
+          created_at: string
+          email: string
+          email_sent_at: string | null
+          id: string
+          name: string | null
+          source: string
+          status: string
+        }
+        Insert: {
+          course_slug: string
+          created_at?: string
+          email: string
+          email_sent_at?: string | null
+          id?: string
+          name?: string | null
+          source?: string
+          status?: string
+        }
+        Update: {
+          course_slug?: string
+          created_at?: string
+          email?: string
+          email_sent_at?: string | null
+          id?: string
+          name?: string | null
+          source?: string
+          status?: string
+        }
+        Relationships: []
+      }
       courses: {
         Row: {
           banner: string | null

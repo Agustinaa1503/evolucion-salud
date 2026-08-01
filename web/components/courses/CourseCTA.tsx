@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight, Bell, ExternalLink } from 'lucide-react';
-import NewsletterForm from '@/components/NewsletterForm';
+import WaitlistForm from '@/components/WaitlistForm';
 import type { Course } from '@/lib/courses/types';
 
 /**
@@ -31,7 +31,11 @@ export default function CourseCTA({ course }: { course: Course }) {
           </div>
         </div>
         <div className="mt-4">
-          <NewsletterForm compact />
+          <WaitlistForm
+            courseSlug={course.slug}
+            courseTitle={course.title}
+            compact
+          />
         </div>
       </div>
     );
