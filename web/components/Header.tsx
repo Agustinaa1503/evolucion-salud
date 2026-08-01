@@ -11,6 +11,7 @@ import {
   Heart,
   LogOut,
   Menu,
+  Search,
   Settings,
   ShoppingCart,
   UserRound,
@@ -121,6 +122,15 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2.5">
+          <Link
+            href="/buscar"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200/70 bg-white/70 text-slate-600 backdrop-blur transition hover:border-brand-300 hover:text-brand-700"
+            aria-label="Buscar"
+            title="Buscar"
+          >
+            <Search className="h-5 w-5" aria-hidden="true" />
+          </Link>
+
           <Link
             href="/cursos"
             className="hidden items-center gap-1.5 rounded-full bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lift transition hover:bg-brand-700 md:inline-flex"
