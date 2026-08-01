@@ -71,3 +71,31 @@ export function videoProgressPct(
   if (!durationSeconds || durationSeconds <= 0) return 0;
   return Math.min(100, Math.round((watchedSeconds / durationSeconds) * 100));
 }
+
+/* ---------- Dashboard del alumno (FASE 4) ---------- */
+
+/** Formatea segundos de estudio como duración legible («2 h 15 min»). */
+export function formatStudyTime(totalSeconds: number): string {
+  const totalMinutes = Math.floor(Math.max(0, totalSeconds) / 60);
+  if (totalMinutes <= 0) return '0 min';
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours > 0 && minutes > 0) return `${hours} h ${minutes} min`;
+  if (hours > 0) return `${hours} h`;
+  return `${minutes} min`;
+}
+
+/** Resumen del dashboard a partir de los cursos del alumno. */
+export function summarizeStats(
+  courses: Array<{ status: CourseUserStatus; totalStudySeconds: number }>
+): { inProgress: number; completed: number; totalStudySeconds: number } {
+  return courses.reduce(
+    (acc, course) => {
+      if (course.status === 'completed') acc.completed += 1;
+      else acc.inProgress += 1;
+      acc.totalStudySeconds += course.totalStudySeconds;
+      return acc;
+    },
+    { inProgress: 0, completed: 0, totalStudySeconds: 0 }
+  );
+}

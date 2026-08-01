@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import {
   ArrowRight,
+  GraduationCap,
   LogOut,
   Menu,
   Settings,
@@ -58,6 +59,7 @@ export default function Header() {
     'ES';
 
   const userLinks = [
+    { href: '/mi-aprendizaje', label: 'Mi aprendizaje', icon: GraduationCap },
     { href: '/profile', label: 'Mi perfil', icon: UserRound },
     { href: '/settings', label: 'Configuración', icon: Settings },
   ];

@@ -2,12 +2,14 @@
 
 import { createServerSupabaseClient, getAuthSession } from '@/lib/auth/session';
 import { getCourse } from '@/lib/courses/registry';
+import { countLessons } from '@/lib/courses/types';
 import { isScoredQuiz, scoreQuiz, type QuizAnswer, type QuizAttemptResult } from './quiz';
 import type { Json } from '@/lib/supabase/types';
 import {
   computeProgressPct,
   isVideoCompleted,
   statusFromProgress,
+  summarizeStats,
   videoProgressPct,
   type CourseProgressData,
   type CourseUserStatus,
@@ -460,4 +462,127 @@ export async function getQuizAttempts(courseSlug: string): Promise<QuizAttemptRo
     .order('submitted_at', { ascending: false })
     .limit(5);
   return data ?? [];
+}
+
+/* -------------------------------------------------------------------------- */
+/* FASE 4 · Dashboard del alumno (Mi aprendizaje)                              */
+/* -------------------------------------------------------------------------- */
+
+export type MyCourseEntry = {
+  slug: string;
+  title: string;
+  subtitle: string;
+  status: CourseUserStatus;
+  progressPct: number;
+  totalStudySeconds: number;
+  startedAt: string | null;
+  lastAccessAt: string;
+  completedAt: string | null;
+  totalLessons: number;
+  completedLessons: number;
+};
+
+export type MyNotification = {
+  id: string;
+  type: string;
+  title: string;
+  body: string | null;
+  link: string | null;
+  readAt: string | null;
+  createdAt: string;
+};
+
+export type MyLearningResult = {
+  authed: boolean;
+  error?: string;
+  courses: MyCourseEntry[];
+  stats: { inProgress: number; completed: number; totalStudySeconds: number };
+  notifications: MyNotification[];
+  unreadCount: number;
+};
+
+/**
+ * Datos del dashboard «Mi aprendizaje»: cursos del usuario con su progreso,
+ * resumen y notificaciones recientes. El detalle del curso (título, lecciones)
+ * se resuelve contra el catálogo Markdown (fuente de verdad).
+ */
+export async function getMyLearning(): Promise<MyLearningResult> {
+  const session = await getAuthSession();
+  if (!session.user) {
+    return {
+      authed: false,
+      courses: [],
+      stats: { inProgress: 0, completed: 0, totalStudySeconds: 0 },
+      notifications: [],
+      unreadCount: 0,
+    };
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const userId = session.user.id;
+
+  const { data: enrollments } = await supabase
+    .from('user_courses')
+    .select('course_id, status, progress_pct, total_study_seconds, started_at, last_access_at, completed_at')
+    .eq('user_id', userId)
+    .order('last_access_at', { ascending: false });
+
+  const { data: catalogRows } = await supabase.from('courses').select('id, slug');
+  const slugById = new Map((catalogRows ?? []).map((row) => [row.id, row.slug]));
+
+  const { data: lessonRows } = await supabase
+    .from('user_lesson_progress')
+    .select('course_id')
+    .eq('user_id', userId)
+    .eq('status', 'completed');
+  const completedByCourse = new Map<string, number>();
+  for (const row of lessonRows ?? []) {
+    completedByCourse.set(row.course_id, (completedByCourse.get(row.course_id) ?? 0) + 1);
+  }
+
+  const courses: MyCourseEntry[] = [];
+  for (const enrolled of enrollments ?? []) {
+    const slug = slugById.get(enrolled.course_id);
+    if (!slug) continue;
+    const catalog = getCourse(slug);
+    const status = (enrolled.status ?? 'in_progress') as CourseUserStatus;
+    courses.push({
+      slug,
+      title: catalog?.title ?? slug,
+      subtitle: catalog?.subtitle ?? '',
+      status,
+      progressPct: enrolled.progress_pct ?? 0,
+      totalStudySeconds: enrolled.total_study_seconds ?? 0,
+      startedAt: enrolled.started_at ?? null,
+      lastAccessAt: enrolled.last_access_at,
+      completedAt: enrolled.completed_at ?? null,
+      totalLessons: catalog ? countLessons(catalog) : 0,
+      completedLessons: completedByCourse.get(enrolled.course_id) ?? 0,
+    });
+  }
+
+  const { data: notificationRows } = await supabase
+    .from('notifications')
+    .select('id, type, title, body, link, read_at, created_at')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  const notifications: MyNotification[] = (notificationRows ?? []).map((row) => ({
+    id: row.id,
+    type: row.type,
+    title: row.title,
+    body: row.body,
+    link: row.link,
+    readAt: row.read_at,
+    createdAt: row.created_at,
+  }));
+
+  return {
+    authed: true,
+    courses,
+    stats: summarizeStats(courses),
+    notifications,
+    unreadCount: notifications.filter((n) => !n.readAt).length,
+  };
 }
