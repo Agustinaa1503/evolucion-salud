@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { cache } from 'react';
 import type { Database } from '@/lib/supabase/types';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
+import { canAccessAdmin, hasPermission } from '@/lib/admin/rbac';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
@@ -102,8 +103,22 @@ export async function requireUser(): Promise<AuthUser> {
 /** Exige sesión activa con rol administrador. */
 export async function requireAdmin(): Promise<AuthUser> {
   const session = await requireUser();
-  if (session.profile?.rol !== 'admin' || session.profile?.estado !== 'activo') {
+  if (!canAccessAdmin(session.profile?.rol) || session.profile?.estado !== 'activo') {
     redirect('/cursos');
+  }
+  return session;
+}
+
+/**
+ * Exige sesión activa con rol de administración (acceso al BackOffice) y,
+ * opcionalmente, un permiso específico del módulo. Redirige a /login si no hay
+ * sesión, a /cursos si el rol no tiene acceso al BackOffice y a /admin si el
+ * rol no tiene el permiso requerido.
+ */
+export async function requireAdminRole(permission?: string): Promise<AuthUser> {
+  const session = await requireAdmin();
+  if (permission && !hasPermission(session.profile?.rol, permission)) {
+    redirect('/admin');
   }
   return session;
 }

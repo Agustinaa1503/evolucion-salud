@@ -56,6 +56,79 @@ export type Database = {
           },
         ]
       }
+      admin_audit_logs: {
+        Row: {
+          action: string
+          category: string
+          created_at: string
+          detail: Json
+          id: string
+          ip_address: string | null
+          target_id: string | null
+          target_type: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          category: string
+          created_at?: string
+          detail?: Json
+          id?: string
+          ip_address?: string | null
+          target_id?: string | null
+          target_type?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          category?: string
+          created_at?: string
+          detail?: Json
+          id?: string
+          ip_address?: string | null
+          target_id?: string | null
+          target_type?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      backoffice_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backoffice_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string
@@ -629,6 +702,30 @@ export type Database = {
         }
         Relationships: []
       }
+      newsletter_segments: {
+        Row: {
+          created_at: string
+          description: string | null
+          filter: Json
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          filter?: Json
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          filter?: Json
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
@@ -884,6 +981,32 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "course_quizzes"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      role_permissions: {
+        Row: {
+          created_at: string
+          permission: string
+          role_slug: string
+        }
+        Insert: {
+          created_at?: string
+          permission: string
+          role_slug: string
+        }
+        Update: {
+          created_at?: string
+          permission?: string
+          role_slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_role_slug_fkey"
+            columns: ["role_slug"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["slug"]
           },
         ]
       }
@@ -1239,6 +1362,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      current_role: { Args: never; Returns: string }
       get_certificate_public: {
         Args: { p_id: string }
         Returns: {
@@ -1249,6 +1373,7 @@ export type Database = {
           valid: boolean
         }[]
       }
+      has_permission: { Args: { p_permission: string }; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
       issue_certificate: {
         Args: { p_course_id: string; p_pdf_path: string; p_user_id: string }
@@ -1264,6 +1389,16 @@ export type Database = {
           p_event: string
           p_payload?: Json
           p_user_id: string
+        }
+        Returns: undefined
+      }
+      log_admin_event: {
+        Args: {
+          p_action: string
+          p_category: string
+          p_detail?: Json
+          p_target_id?: string
+          p_target_type?: string
         }
         Returns: undefined
       }

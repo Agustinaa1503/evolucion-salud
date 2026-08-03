@@ -1,11 +1,26 @@
-export type Role = 'alumno' | 'admin';
+export type Role =
+  | 'super_admin'
+  | 'admin'
+  | 'editor'
+  | 'teacher'
+  | 'student'
+  | 'guest'
+  | 'alumno';
 
 export type AuthProviderName = 'google' | 'github' | 'facebook';
 
 export const ROLES: Record<Role, string> = {
-  alumno: 'Alumno',
+  super_admin: 'Super Administrador',
   admin: 'Administrador',
+  editor: 'Editor',
+  teacher: 'Docente',
+  student: 'Alumno',
+  guest: 'Invitado',
+  alumno: 'Alumno',
 };
+
+/** Roles con acceso al BackOffice. */
+export const ADMIN_ROLE_SLUGS: Role[] = ['super_admin', 'admin', 'editor', 'teacher'];
 
 /**
  * Proveedores OAuth habilitados. Se leen de NEXT_PUBLIC_AUTH_PROVIDERS

@@ -12,7 +12,7 @@ import { isAuthPage } from '@/lib/auth/config';
  */
 export default function PublicShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const minimal = isAuthPage(pathname);
+  const minimal = isAuthPage(pathname) || pathname.startsWith('/admin');
 
   return (
     <>
