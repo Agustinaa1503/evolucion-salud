@@ -3,8 +3,8 @@
  *
  * Verifica:
  *  1. RBAC: la tabla `role_permissions` tiene la matriz esperada por rol
- *     (24 super_admin / 23 admin / 16 editor / 7 teacher; student y guest sin
- *     permisos de BackOffice). Total 70.
+ *     (28 super_admin / 27 admin / 19 editor / 7 teacher; student y guest sin
+ *     permisos de BackOffice). Total 81.
  *  2. RPC `has_permission`: anon → false (sin perfil); super_admin → true.
  *     RPC `current_role`: anon → null; super_admin → 'super_admin'.
  *  3. RLS: anon NO ve `admin_audit_logs`, `backoffice_settings` ni
@@ -51,7 +51,7 @@ const check = (label, ok, detail = '') => {
   if (!ok) process.exitCode = 1;
 };
 
-const EXPECTED_COUNTS = { super_admin: 24, admin: 23, editor: 16, teacher: 7 };
+const EXPECTED_COUNTS = { super_admin: 28, admin: 27, editor: 19, teacher: 7 };
 
 (async () => {
   let adminUid = null;
@@ -63,11 +63,11 @@ const EXPECTED_COUNTS = { super_admin: 24, admin: 23, editor: 16, teacher: 7 };
     check('RBAC: se leen role_permissions', !permsErr, permsErr?.message ?? '');
     const byRole = {};
     for (const r of perms ?? []) byRole[r.role_slug] = (byRole[r.role_slug] ?? 0) + 1;
-    let matrixOk = (perms ?? []).length === 70;
+    let matrixOk = (perms ?? []).length === 81;
     for (const [rol, n] of Object.entries(EXPECTED_COUNTS)) {
       if (byRole[rol] !== n) matrixOk = false;
     }
-    check('RBAC: matriz de permisos (70 filas)', matrixOk, JSON.stringify(byRole));
+    check('RBAC: matriz de permisos (81 filas)', matrixOk, JSON.stringify(byRole));
     check(
       'RBAC: student/guest sin permisos',
       (byRole['student'] ?? 0) === 0 && (byRole['guest'] ?? 0) === 0
@@ -150,8 +150,12 @@ const EXPECTED_COUNTS = { super_admin: 24, admin: 23, editor: 16, teacher: 7 };
     check('RPC current_role: super_admin autenticado', role === 'super_admin', `recibido: ${role}`);
     const { data: canAccess } = await authClient.rpc('has_permission', { p_permission: 'admin.access' });
     const { data: canDelete } = await authClient.rpc('has_permission', { p_permission: 'admin.users.delete' });
+    const { data: canContentRead } = await authClient.rpc('has_permission', { p_permission: 'admin.content.read' });
+    const { data: canContentWrite } = await authClient.rpc('has_permission', { p_permission: 'admin.content.write' });
     check('RPC has_permission: admin.access → true', canAccess === true, `recibido: ${canAccess}`);
     check('RPC has_permission: admin.users.delete → true', canDelete === true, `recibido: ${canDelete}`);
+    check('RPC has_permission: admin.content.read → true', canContentRead === true, `recibido: ${canContentRead}`);
+    check('RPC has_permission: admin.content.write → true', canContentWrite === true, `recibido: ${canContentWrite}`);
 
     // 8. Autenticado con permiso puede insertar en auditoría vía RPC
     const { error: authLogErr } = await authClient.rpc('log_admin_event', {

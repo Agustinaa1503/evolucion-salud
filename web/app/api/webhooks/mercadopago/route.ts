@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { verifyWebhookSignature } from '@/lib/mp/api';
 import { isMpConfigured } from '@/lib/mp/config';
 import { refreshOrderFromPaymentId } from '@/lib/orders';
+import { deliverIfPaid } from '@/lib/shop/licenses';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +34,14 @@ export async function POST(request: Request) {
   const data = (body.data ?? {}) as { id?: number | string };
 
   if (type === 'payment' && data.id) {
-    await refreshOrderFromPaymentId(String(data.id)).catch(() => null);
+    const order = await refreshOrderFromPaymentId(String(data.id)).catch(
+      () => null
+    );
+    // Entrega automática de productos: si la orden quedó pagada, se crean
+    // las licencias y se envía el email de acceso (idempotente).
+    if (order?.status === 'paid') {
+      await deliverIfPaid(order).catch(() => null);
+    }
   }
 
   return NextResponse.json({ ok: true });

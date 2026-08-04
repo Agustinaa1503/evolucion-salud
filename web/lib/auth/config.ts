@@ -49,6 +49,7 @@ export const PROTECTED_PAGES = [
   '/settings',
   '/mi-aprendizaje',
   '/mis-favoritos',
+  '/mi-biblioteca',
   '/admin',
 ];
 

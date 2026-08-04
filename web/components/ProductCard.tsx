@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, Clock, User } from 'lucide-react';
 import CardCover from './CardCover';
 import AddToCartButton from './AddToCartButton';
 import type { Product } from '@/lib/data/products';
-import { formatPrice } from '@/lib/utils';
+import { formatLabel } from '@/lib/products/types';
+import { priceLabel } from '@/lib/products/pricing';
 
 export default function ProductCard({ product }: { product: Product }) {
   const free = product.price === 0;
@@ -18,7 +19,11 @@ export default function ProductCard({ product }: { product: Product }) {
           className="h-52"
         />
         <div className="absolute left-4 top-4 flex items-center gap-2">
-          {product.badge ? (
+          {product.format ? (
+            <span className="inline-flex items-center rounded-full border border-white/30 bg-black/35 px-3 py-1 text-xs font-bold text-white backdrop-blur">
+              {formatLabel[product.format]}
+            </span>
+          ) : product.badge ? (
             <span className="inline-flex items-center rounded-full border border-white/30 bg-black/35 px-3 py-1 text-xs font-bold text-white backdrop-blur">
               {product.badge}
             </span>
@@ -35,9 +40,27 @@ export default function ProductCard({ product }: { product: Product }) {
           {product.title}
         </h3>
         <p className="mt-1 text-sm text-slate-600">{product.subtitle}</p>
+
+        {(product.author || product.duration) ? (
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+            {product.author ? (
+              <span className="flex items-center gap-1">
+                <User className="h-3 w-3" aria-hidden="true" />
+                {product.author}
+              </span>
+            ) : null}
+            {product.duration ? (
+              <span className="flex items-center gap-1">
+                <Clock className="h-3 w-3" aria-hidden="true" />
+                {product.duration}
+              </span>
+            ) : null}
+          </div>
+        ) : null}
+
         <div className="mt-3 flex items-baseline gap-2">
           <p className="text-2xl font-extrabold tracking-tight text-slate-900">
-            {formatPrice(product.price, product.interval)}
+            {priceLabel(product)}
           </p>
           {product.compareAt ? (
             <p className="text-sm font-medium text-slate-400 line-through">

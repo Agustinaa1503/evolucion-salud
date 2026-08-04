@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.15"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       activity_logs: {
@@ -96,6 +121,88 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analytics_events: {
+        Row: {
+          created_at: string
+          event: string
+          id: string
+          meta: Json
+          path: string | null
+          referrer: string | null
+          session_id: string | null
+          source: string | null
+          ua: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event: string
+          id?: string
+          meta?: Json
+          path?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          source?: string | null
+          ua?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          id?: string
+          meta?: Json
+          path?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          source?: string | null
+          ua?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      asset_downloads: {
+        Row: {
+          asset_slug: string
+          downloaded_at: string
+          file_name: string | null
+          id: string
+          license_id: string
+          product_slug: string
+        }
+        Insert: {
+          asset_slug: string
+          downloaded_at?: string
+          file_name?: string | null
+          id?: string
+          license_id: string
+          product_slug: string
+        }
+        Update: {
+          asset_slug?: string
+          downloaded_at?: string
+          file_name?: string | null
+          id?: string
+          license_id?: string
+          product_slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_downloads_license_id_fkey"
+            columns: ["license_id"]
+            isOneToOne: false
+            referencedRelation: "licenses"
             referencedColumns: ["id"]
           },
         ]
@@ -286,6 +393,59 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "tags"
             referencedColumns: ["slug"]
+          },
+        ]
+      }
+      content_versions: {
+        Row: {
+          body: string
+          content_slug: string
+          content_type: string
+          created_at: string
+          editor_email: string | null
+          editor_id: string | null
+          editor_kind: string
+          frontmatter: Json
+          id: string
+          status_after: string
+          summary: string | null
+          version: number
+        }
+        Insert: {
+          body?: string
+          content_slug: string
+          content_type: string
+          created_at?: string
+          editor_email?: string | null
+          editor_id?: string | null
+          editor_kind?: string
+          frontmatter?: Json
+          id?: string
+          status_after: string
+          summary?: string | null
+          version: number
+        }
+        Update: {
+          body?: string
+          content_slug?: string
+          content_type?: string
+          created_at?: string
+          editor_email?: string | null
+          editor_id?: string | null
+          editor_kind?: string
+          frontmatter?: Json
+          id?: string
+          status_after?: string
+          summary?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_versions_editor_id_fkey"
+            columns: ["editor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -702,6 +862,66 @@ export type Database = {
         }
         Relationships: []
       }
+      licenses: {
+        Row: {
+          access_token: string
+          created_at: string
+          customer_name: string | null
+          email: string
+          granted_at: string
+          id: string
+          last_downloaded_at: string | null
+          order_id: string
+          product_slug: string
+          product_title: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          customer_name?: string | null
+          email: string
+          granted_at?: string
+          id?: string
+          last_downloaded_at?: string | null
+          order_id: string
+          product_slug: string
+          product_title: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          customer_name?: string | null
+          email?: string
+          granted_at?: string
+          id?: string
+          last_downloaded_at?: string | null
+          order_id?: string
+          product_slug?: string
+          product_title?: string
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "licenses_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "licenses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       newsletter_segments: {
         Row: {
           created_at: string
@@ -839,6 +1059,57 @@ export type Database = {
           payment_method?: string
           status?: string
           subtotal?: number
+        }
+        Relationships: []
+      }
+      product_assets: {
+        Row: {
+          asset_slug: string
+          created_at: string
+          file_name: string
+          id: string
+          mime: string
+          product_slug: string
+          size_bytes: number
+          sort_order: number
+          storage_path: string | null
+          title: string
+          type: string
+          updated_at: string
+          uploaded_at: string | null
+          version: number
+        }
+        Insert: {
+          asset_slug: string
+          created_at?: string
+          file_name: string
+          id?: string
+          mime: string
+          product_slug: string
+          size_bytes?: number
+          sort_order?: number
+          storage_path?: string | null
+          title: string
+          type?: string
+          updated_at?: string
+          uploaded_at?: string | null
+          version?: number
+        }
+        Update: {
+          asset_slug?: string
+          created_at?: string
+          file_name?: string
+          id?: string
+          mime?: string
+          product_slug?: string
+          size_bytes?: number
+          sort_order?: number
+          storage_path?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+          uploaded_at?: string | null
+          version?: number
         }
         Relationships: []
       }
@@ -1402,6 +1673,20 @@ export type Database = {
         }
         Returns: undefined
       }
+      log_content_version: {
+        Args: {
+          p_body?: string
+          p_content_slug: string
+          p_content_type: string
+          p_editor_id?: string
+          p_editor_kind?: string
+          p_frontmatter?: Json
+          p_status_after: string
+          p_summary?: string
+          p_version: number
+        }
+        Returns: undefined
+      }
       next_certificate_number: { Args: never; Returns: string }
     }
     Enums: {
@@ -1531,6 +1816,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

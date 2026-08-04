@@ -3,11 +3,15 @@ import {
   normalizeSearchTerm,
   courseMatches,
   blogPostMatches,
+  productMatches,
   searchCourses,
   searchBlogPosts,
+  searchProducts,
+  searchAll,
 } from '../lib/search';
 import type { Course } from '../lib/courses/types';
 import type { BlogPost } from '../lib/data/blog';
+import type { Product } from '../lib/content/types';
 
 function makeCourse(overrides: Partial<Course>): Course {
   return {
@@ -111,5 +115,70 @@ describe('blogPostMatches / searchBlogPosts', () => {
   it('searchBlogPosts devuelve los artículos coincidentes', () => {
     expect(searchBlogPosts([post], 'ansiedad').map((h) => h.slug)).toEqual([post.slug]);
     expect(searchBlogPosts([post], 'zzz')).toEqual([]);
+  });
+});
+
+const sampleProduct: Product = {
+  slug: 'guia-basica',
+  title: 'Guía Básica',
+  subtitle: 'El día después del diagnóstico',
+  description: 'Una guía para afrontar el diagnóstico.',
+  shortDescription: 'Guía de apoyo emocional.',
+  price: 19,
+  level: 'entrada',
+  productType: 'simple',
+  author: 'Lic. Claudia Espinoza',
+  format: 'guia',
+  features: [],
+  includes: [],
+  categories: ['diagnostico'],
+  tags: ['guia', 'diagnostico'],
+  audience: ['publico-general'],
+  icon: 'book',
+  gradient: 'from-brand-500 to-leaf-600',
+  image: '',
+};
+
+describe('productMatches / searchProducts (12.3.3)', () => {
+  it('coincide en título, subtítulo, autor y formato', () => {
+    expect(productMatches(sampleProduct, 'guia basica')).toBe(true);
+    expect(productMatches(sampleProduct, 'diagnostico')).toBe(true);
+    expect(productMatches(sampleProduct, 'espinoza')).toBe(true);
+    expect(productMatches(sampleProduct, 'guia')).toBe(true);
+  });
+
+  it('coincide en tags y categorías', () => {
+    expect(productMatches(sampleProduct, 'diagnostico')).toBe(true);
+  });
+
+  it('no coincide si el término no aparece', () => {
+    expect(productMatches(sampleProduct, 'cocina')).toBe(false);
+  });
+
+  it('searchProducts devuelve productos coincidentes', () => {
+    const hits = searchProducts([sampleProduct], 'guia');
+    expect(hits).toHaveLength(1);
+    expect(hits[0].slug).toBe('guia-basica');
+    expect(hits[0].type).toBe('product');
+  });
+
+  it('searchProducts devuelve vacío sin query', () => {
+    expect(searchProducts([sampleProduct], '')).toEqual([]);
+    expect(searchProducts([sampleProduct], '   ')).toEqual([]);
+  });
+});
+
+describe('searchAll incluye productos (12.3.3)', () => {
+  it('devuelve cursos, blog y productos', () => {
+    const result = searchAll([makeCourse({})], [post], 'pine', [sampleProduct]);
+    expect(result.courses.length).toBe(1);
+    expect(result.posts.length).toBe(0);
+    expect(result.products.length).toBe(0);
+  });
+
+  it('encuentra productos en searchAll', () => {
+    const result = searchAll([makeCourse({})], [post], 'guia', [sampleProduct]);
+    expect(result.products.length).toBe(1);
+    expect(result.products[0].slug).toBe('guia-basica');
   });
 });

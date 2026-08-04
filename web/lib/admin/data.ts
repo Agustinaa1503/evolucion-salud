@@ -19,7 +19,9 @@ export type AdminTable =
   | 'courses'
   | 'user_courses'
   | 'admin_audit_logs'
-  | 'roles';
+  | 'roles'
+  | 'orders'
+  | 'licenses';
 
 export const adminDb = (): SupabaseClient<Database> | null => {
   if (!isServerSupabaseConfigured) return null;

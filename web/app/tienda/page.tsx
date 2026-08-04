@@ -62,7 +62,7 @@ export default function TiendaPage() {
             <p className="mt-5 flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-xs leading-relaxed text-amber-700">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" aria-hidden="true" />
               El checkout es una demo local. En producción se conecta con
-              MercadoPago / Hotmart para el cobro y la entrega automática del
+              MercadoPago para el cobro y la entrega automática del
               PDF por email.
             </p>
           </div>
@@ -87,7 +87,7 @@ export default function TiendaPage() {
                 <p className="mt-3 leading-relaxed text-leaf-50/90">
                   Agregá tus productos al carrito y probá el flujo completo de
                   compra: resumen, datos y método de pago. En producción, el pago
-                  se procesa con MercadoPago o Hotmart y la entrega del PDF es
+                  se procesa con MercadoPago y la entrega del PDF es
                   automática.
                 </p>
                 <Link href="/carrito" className="btn-dark mt-6">

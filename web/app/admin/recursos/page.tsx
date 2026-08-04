@@ -94,8 +94,8 @@ export default async function AdminRecursosPage({
                 {paged.map((p) => (
                   <tr key={p.slug} className="transition-colors hover:bg-slate-50/60 dark:hover:bg-slate-900/40">
                     <Td>
-                      <Link href={`/tienda/${p.slug}`} className="block max-w-[400px]">
-                        <span className="block truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{p.title}</span>
+                      <Link href={`/admin/recursos/${p.slug}`} className="block max-w-[400px]">
+                        <span className="block truncate text-sm font-semibold text-slate-800 hover:text-brand-600 dark:text-slate-100 dark:hover:text-brand-400">{p.title}</span>
                         <span className="block truncate text-xs text-slate-500 dark:text-slate-400">{p.subtitle}</span>
                       </Link>
                     </Td>

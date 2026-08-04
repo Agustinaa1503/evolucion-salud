@@ -43,8 +43,8 @@ export default async function AdminPodcastPage({
           rows.length > 0 ? (
             <ExportCsvButton
               filename="podcast"
-              headers={['Título', 'Slug', 'Duración']}
-              rows={rows.map((e) => [e.title, e.slug, e.duration])}
+              headers={['Título', 'Slug', 'Serie', 'Duración']}
+              rows={rows.map((e) => [e.title, e.slug, e.series ?? '', e.duration ?? ''])}
             />
           ) : undefined
         }
@@ -85,7 +85,7 @@ export default async function AdminPodcastPage({
                       </div>
                     </Td>
                     <Td>
-                      <span className="text-sm text-slate-600 dark:text-slate-300">{e.duration}</span>
+                      <span className="text-sm text-slate-600 dark:text-slate-300">{e.duration ?? '—'}</span>
                     </Td>
                     <Td>
                       <div className="flex gap-1">

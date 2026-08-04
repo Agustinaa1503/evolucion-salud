@@ -9,6 +9,7 @@ import {
   ArrowRight,
   GraduationCap,
   Heart,
+  Library,
   LogOut,
   Menu,
   Search,
@@ -63,6 +64,7 @@ export default function Header() {
 
   const userLinks = [
     { href: '/mi-aprendizaje', label: 'Mi aprendizaje', icon: GraduationCap },
+    { href: '/mi-biblioteca', label: 'Mi biblioteca', icon: Library },
     { href: '/mis-favoritos', label: 'Mis favoritos', icon: Heart },
     { href: '/profile', label: 'Mi perfil', icon: UserRound },
     { href: '/settings', label: 'Configuración', icon: Settings },

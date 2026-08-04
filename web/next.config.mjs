@@ -18,6 +18,20 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/admin/recursos',
+        destination: '/admin/productos',
+        permanent: true,
+      },
+      {
+        source: '/admin/recursos/:slug',
+        destination: '/admin/productos/:slug',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

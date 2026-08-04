@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const TYPE_ORDER: ContentType[] = ['course', 'blog', 'podcast', 'resource', 'newsletter'];
+const TYPE_ORDER: ContentType[] = ['course', 'blog', 'podcast', 'product', 'newsletter'];
 
 export default async function TagPage({ params }: Props) {
   const { slug } = await params;

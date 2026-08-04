@@ -8,13 +8,17 @@ import {
   Download,
   Lock,
   Sparkles,
+  User,
+  Clock,
 } from 'lucide-react';
 import { getProduct, products } from '@/lib/data/products';
+import { formatLabel } from '@/lib/products/types';
+import { priceLabel } from '@/lib/products/pricing';
+import { relatedProducts } from '@/lib/products/catalog';
 import AddToCartButton from '@/components/AddToCartButton';
-import Disclaimer from '@/components/Disclaimer';
 import ProductCard from '@/components/ProductCard';
+import Disclaimer from '@/components/Disclaimer';
 import Reveal from '@/components/motion/Reveal';
-import { formatPrice } from '@/lib/utils';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -28,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!product) return {};
   return {
     title: product.title,
-    description: product.subtitle,
+    description: product.shortDescription ?? product.subtitle,
   };
 }
 
@@ -39,7 +43,7 @@ export default async function ProductDetailPage({ params }: Props) {
   if (!product) notFound();
 
   const free = product.price === 0;
-  const others = products.filter((p) => p.slug !== slug).slice(0, 3);
+  const others = relatedProducts(product, 3);
 
   return (
     <>
@@ -58,10 +62,10 @@ export default async function ProductDetailPage({ params }: Props) {
 
           <div className="mt-8 grid gap-10 lg:grid-cols-2 lg:items-start">
             <div className="group relative h-72 overflow-hidden rounded-3xl border border-white/10 shadow-lift lg:h-96">
-              {product.image ? (
+              {product.banner || product.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={product.image}
+                  src={product.banner || product.image}
                   alt={product.title}
                   className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
                 />
@@ -71,7 +75,11 @@ export default async function ProductDetailPage({ params }: Props) {
                 </div>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-ink-950/70 via-transparent to-transparent" aria-hidden="true" />
-              {product.badge ? (
+              {product.format ? (
+                <span className="absolute bottom-4 left-4 inline-flex items-center rounded-full bg-white/90 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-slate-800 backdrop-blur">
+                  {formatLabel[product.format]}
+                </span>
+              ) : product.badge ? (
                 <span className="absolute bottom-4 left-4 inline-flex items-center rounded-full bg-white/90 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-slate-800 backdrop-blur">
                   {product.badge}
                 </span>
@@ -91,9 +99,26 @@ export default async function ProductDetailPage({ params }: Props) {
                 {product.subtitle}
               </p>
 
+              {(product.author || product.duration) ? (
+                <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-slate-400">
+                  {product.author ? (
+                    <span className="flex items-center gap-1.5">
+                      <User className="h-4 w-4" aria-hidden="true" />
+                      {product.author}
+                    </span>
+                  ) : null}
+                  {product.duration ? (
+                    <span className="flex items-center gap-1.5">
+                      <Clock className="h-4 w-4" aria-hidden="true" />
+                      {product.duration}
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
+
               <div className="mt-6 flex items-baseline gap-3">
                 <span className="text-3xl font-extrabold text-white">
-                  {formatPrice(product.price, product.interval)}
+                  {priceLabel(product)}
                 </span>
                 {product.compareAt ? (
                   <span className="text-lg font-medium text-slate-400 line-through">
@@ -102,7 +127,13 @@ export default async function ProductDetailPage({ params }: Props) {
                 ) : null}
               </div>
 
-              <p className="mt-5 leading-relaxed text-slate-300">
+              {product.shortDescription ? (
+                <p className="mt-5 leading-relaxed text-slate-300">
+                  {product.shortDescription}
+                </p>
+              ) : null}
+
+              <p className="mt-3 leading-relaxed text-slate-400 text-sm">
                 {product.description}
               </p>
 
@@ -159,10 +190,10 @@ export default async function ProductDetailPage({ params }: Props) {
               </div>
 
               <div className="mt-6 flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
-                <CreditCard className="mt-0.5 h-5 w-5 shrink-0 text-brand-300" aria-hidden="true" />
+                <CreditCard className="mt-0.5 h-5 w-5 shrink-0 text-brand-300" />
                 <p className="text-sm text-slate-300">
                   Pagás con <strong className="text-white">MercadoPago</strong>{' '}
-                  o <strong className="text-white">Hotmart</strong> (integración
+                  <strong className="text-white"></strong> (integración
                   lista en producción). Mientras tanto, el checkout funciona
                   como demo local para probar el flujo completo.
                 </p>

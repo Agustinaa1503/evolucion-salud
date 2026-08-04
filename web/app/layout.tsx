@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { Manrope } from 'next/font/google';
 import './globals.css';
 import PublicShell from '@/components/PublicShell';
 import JsonLd from '@/components/JsonLd';
+import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { CartProvider } from '@/components/CartProvider';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import { site, socialLinks } from '@/lib/data/site';
@@ -83,6 +85,9 @@ export default function RootLayout({
         <JsonLd data={webSiteJsonLd} />
         <AuthProvider>
           <CartProvider>
+            <Suspense fallback={null}>
+              <AnalyticsTracker />
+            </Suspense>
             <PublicShell>{children}</PublicShell>
           </CartProvider>
         </AuthProvider>

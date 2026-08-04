@@ -1,12 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, FileText, GraduationCap, SearchX } from 'lucide-react';
+import { ArrowRight, FileText, GraduationCap, Package, SearchX } from 'lucide-react';
 import CourseCard from '@/components/CourseCard';
+import ProductCard from '@/components/ProductCard';
 import SearchBox from '@/components/SearchBox';
 import PageHero from '@/components/PageHero';
 import Reveal from '@/components/motion/Reveal';
 import { getAllCourses } from '@/lib/courses/registry';
 import { blogPosts } from '@/lib/data/blog';
+import { products } from '@/lib/data/products';
 import { normalizeSearchTerm, searchAll } from '@/lib/search';
 import { isPublicCourse } from '@/lib/courses/types';
 import { img } from '@/lib/images';
@@ -14,7 +16,7 @@ import { img } from '@/lib/images';
 export const metadata: Metadata = {
   title: 'Buscar',
   description:
-    'Encuentre cursos y artículos de PsicoInmunoNeuroEndocrinología (PINE) en Evolución Salud.',
+    'Encuentre cursos, productos y artículos de PsicoInmunoNeuroEndocrinología (PINE) en Evolución Salud.',
 };
 
 type Props = { searchParams: Promise<{ q?: string }> };
@@ -24,8 +26,8 @@ export default async function BuscarPage({ searchParams }: Props) {
   const query = normalizeSearchTerm(q);
 
   const publicCourses = getAllCourses().filter(isPublicCourse);
-  const { courses, posts } = searchAll(publicCourses, blogPosts, q);
-  const total = courses.length + posts.length;
+  const { courses, posts, products: productHits } = searchAll(publicCourses, blogPosts, q, products);
+  const total = courses.length + posts.length + productHits.length;
 
   return (
     <>
@@ -64,7 +66,7 @@ export default async function BuscarPage({ searchParams }: Props) {
                   </h2>
                   <p className="mt-2 max-w-md text-sm text-slate-600">
                     Pruebe con palabras como «estrés», «sueño», «PINE» o
-                    «cirugía», o explore el catálogo de cursos.
+                    «cirugía», o explore el catálogo de cursos y productos.
                   </p>
                   <Link href="/cursos" className="btn-primary mt-6">
                     <GraduationCap className="h-4 w-4" aria-hidden="true" />
@@ -125,6 +127,21 @@ export default async function BuscarPage({ searchParams }: Props) {
                 </ul>
               </>
             ) : null}
+
+            {productHits.length ? (
+              <>
+                <h2 className="mt-14 text-2xl font-extrabold text-slate-900 sm:text-3xl">
+                  Productos
+                </h2>
+                <div className="mt-6 grid gap-7 md:grid-cols-2 lg:grid-cols-3">
+                  {productHits.map((hit, i) => (
+                    <Reveal key={hit.slug} delay={i * 0.07}>
+                      <ProductCard product={hit.product} />
+                    </Reveal>
+                  ))}
+                </div>
+              </>
+            ) : null}
           </div>
         ) : (
           <Reveal>
@@ -137,7 +154,7 @@ export default async function BuscarPage({ searchParams }: Props) {
               </h2>
               <p className="mt-2 max-w-md text-sm text-slate-600">
                 Buscamos en el título, la descripción, las keywords y el
-                contenido de los cursos y artículos. Sin tildes ni
+                contenido de los cursos, productos y artículos. Sin tildes ni
                 mayúsculas es lo mismo: lo normalizamos por usted.
               </p>
             </div>

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import CourseCard from '@/components/CourseCard';
 import BlogCard from '@/components/BlogCard';
+import ProductCard from '@/components/ProductCard';
 import Reveal from '@/components/motion/Reveal';
 import {
   CONTENT_TYPE_LABELS,
@@ -10,6 +11,7 @@ import {
   type TaxonomyItem,
 } from '@/lib/taxonomy';
 import type { Course } from '@/lib/courses/types';
+import type { Product } from '@/lib/content/types';
 
 /**
  * Contenido relacionado por afinidad de taxonomía (categorías + tags
@@ -55,8 +57,8 @@ export default function CourseRelatedCourses({ course }: { course: Course }) {
           <h2 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">
             {type === 'blog'
               ? 'Artículos relacionados'
-              : type === 'resource'
-                ? 'Recursos relacionados'
+              : type === 'product'
+                ? 'Productos relacionados'
                 : `Contenido relacionado · ${CONTENT_TYPE_LABELS[type as keyof typeof CONTENT_TYPE_LABELS]}`}
           </h2>
           {type === 'blog' ? (
@@ -66,6 +68,17 @@ export default function CourseRelatedCourses({ course }: { course: Course }) {
                 return (
                   <Reveal key={post.slug} delay={i * 0.07}>
                     <BlogCard post={data} />
+                  </Reveal>
+                );
+              })}
+            </div>
+          ) : type === 'product' ? (
+            <div className="mt-8 grid gap-7 md:grid-cols-2 lg:grid-cols-3">
+              {typeItems.map((item, i) => {
+                const data = item.data as Product;
+                return (
+                  <Reveal key={item.slug} delay={i * 0.07}>
+                    <ProductCard product={data} />
                   </Reveal>
                 );
               })}

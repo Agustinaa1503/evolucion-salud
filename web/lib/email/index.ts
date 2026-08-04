@@ -111,3 +111,30 @@ export async function sendWaitlistAdminNotification(input: {
     text: `Nueva inscripción en lista de espera: ${input.email} → ${input.courseTitle} (${input.courseSlug})`,
   });
 }
+
+/**
+ * Entrega post-compra (SUBFASE 12.5): confirma al comprador que su
+ * descargable está listo y le da el enlace de acceso único.
+ */
+export async function sendPurchaseAccessEmail(input: {
+  email: string;
+  name?: string;
+  productTitle: string;
+  accessUrl: string;
+}): Promise<EmailResult> {
+  const greeting = input.name ? `Hola ${input.name}:` : 'Hola:';
+  const button =
+    '<a href="' +
+    input.accessUrl +
+    '" style="display:inline-block;background:#762d8f;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:10px;font-weight:700;margin:8px 0;">Acceder a mi descargable</a>';
+  return sendEmail({
+    from: fromAddress,
+    to: input.email,
+    subject: `Tu descargable de ${input.productTitle} está listo`,
+    html: wrapHtml(
+      input.productTitle,
+      `${greeting}<br/><br/>Tu compra de <strong>${input.productTitle}</strong> fue acreditada. Podés descargar tu material desde el siguiente enlace:<br/><br/>${button}<br/><br/>Este enlace es personal e intransferible. Guardalo en un lugar seguro.`
+    ),
+    text: `Tu compra de ${input.productTitle} fue acreditada. Descargalo desde: ${input.accessUrl}`,
+  });
+}

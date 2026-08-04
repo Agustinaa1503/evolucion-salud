@@ -429,7 +429,7 @@ export default function HomePage() {
                     <Headphones className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <span className="absolute bottom-4 left-4 rounded-full bg-black/45 px-3 py-1 text-xs font-bold text-white backdrop-blur">
-                    {ep.duration}
+                    {ep.duration ?? 'Audio'}
                   </span>
                 </div>
                 <div className="flex flex-1 flex-col p-6">

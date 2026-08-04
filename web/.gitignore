@@ -31,3 +31,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+#txt
+*.txt
+
+# web/.temp/
+/.temp/
+/.web/.temp/
+/.web/.next/
+/supabase/.temp/

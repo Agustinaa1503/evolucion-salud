@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getOrder, refreshOrderFromMp } from '@/lib/orders';
+import { deliverIfPaid } from '@/lib/shop/licenses';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,6 +24,11 @@ export async function GET(
     stored.status === 'pending' && stored.mp_preference_id
       ? await refreshOrderFromMp(externalRef)
       : stored;
+
+  // Entrega automática: red de seguridad del webhook (idempotente).
+  if (order?.status === 'paid') {
+    await deliverIfPaid(order).catch(() => null);
+  }
 
   return NextResponse.json({
     orderId: order?.id,

@@ -1,10 +1,11 @@
 /**
- * Búsqueda global (FASE 9): cursos (catálogo Markdown) y artículos de blog.
- * Funciones puras, sin dependencias, testeadas con Vitest.
+ * Búsqueda global (FASE 9 + SUBFASE 12.3.3): cursos, blog y productos.
+ * Funciones puras, sin dependencias del entorno, testeadas con Vitest.
  */
 
 import type { Course } from '@/lib/courses/types';
 import type { BlogPost } from '@/lib/data/blog';
+import type { Product } from '@/lib/content/types';
 
 export type CourseSearchHit = {
   type: 'course';
@@ -26,7 +27,16 @@ export type BlogSearchHit = {
   post: BlogPost;
 };
 
-export type SearchHit = CourseSearchHit | BlogSearchHit;
+export type ProductSearchHit = {
+  type: 'product';
+  slug: string;
+  title: string;
+  description: string;
+  category: string;
+  product: Product;
+};
+
+export type SearchHit = CourseSearchHit | BlogSearchHit | ProductSearchHit;
 
 /** Normaliza para buscar: minúsculas y sin acentos (sirve para español). */
 export function normalizeSearchTerm(term: string): string {
@@ -70,6 +80,24 @@ export function blogPostMatches(post: BlogPost, term: string): boolean {
   return haystack.some((value) => tokenize(value).includes(term));
 }
 
+/** ¿El término aparece en algún campo del producto? */
+export function productMatches(product: Product, term: string): boolean {
+  const haystack = [
+    product.title,
+    product.subtitle,
+    product.description,
+    product.shortDescription,
+    product.author,
+    product.format,
+    product.level,
+    ...(product.categories ?? []),
+    ...(product.tags ?? []),
+    ...(product.features ?? []),
+    ...(product.includes ?? []),
+  ];
+  return haystack.some((value) => tokenize(value).includes(term));
+}
+
 /** Busca en el catálogo de cursos y devuelve los que coinciden. */
 export function searchCourses(courses: Course[], query: string): CourseSearchHit[] {
   const term = normalizeSearchTerm(query);
@@ -104,14 +132,32 @@ export function searchBlogPosts(posts: BlogPost[], query: string): BlogSearchHit
     }));
 }
 
-/** Búsqueda combinada (cursos + blog) para la página /buscar. */
+/** Busca en el catálogo de productos y devuelve los que coinciden. */
+export function searchProducts(productList: Product[], query: string): ProductSearchHit[] {
+  const term = normalizeSearchTerm(query);
+  if (!term) return [];
+  return productList
+    .filter((product) => productMatches(product, term))
+    .map((product) => ({
+      type: 'product' as const,
+      slug: product.slug,
+      title: product.title,
+      description: product.shortDescription ?? product.description,
+      category: product.categories?.[0] ?? product.level,
+      product,
+    }));
+}
+
+/** Búsqueda combinada (cursos + blog + productos) para la página /buscar. */
 export function searchAll(
   courses: Course[],
   posts: BlogPost[],
-  query: string
-): { courses: CourseSearchHit[]; posts: BlogSearchHit[] } {
+  query: string,
+  productList?: Product[]
+): { courses: CourseSearchHit[]; posts: BlogSearchHit[]; products: ProductSearchHit[] } {
   return {
     courses: searchCourses(courses, query),
     posts: searchBlogPosts(posts, query),
+    products: searchProducts(productList ?? [], query),
   };
 }

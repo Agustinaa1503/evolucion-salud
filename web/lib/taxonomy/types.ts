@@ -12,7 +12,7 @@ export type ContentType =
   | 'course'
   | 'blog'
   | 'podcast'
-  | 'resource'
+  | 'product'
   | 'newsletter';
 
 /** Estados posibles de un contenido. */
@@ -99,7 +99,7 @@ export const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
   course: 'Cursos',
   blog: 'Blog',
   podcast: 'Podcast',
-  resource: 'Recursos',
+  product: 'Productos',
   newsletter: 'Newsletter',
 };
 

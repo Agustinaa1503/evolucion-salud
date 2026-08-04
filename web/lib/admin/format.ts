@@ -11,6 +11,15 @@ const compactFormat = new Intl.NumberFormat('es-AR', {
 
 export const formatNumber = (n: number): string => numberFormat.format(n);
 
+/** Formatea bytes a una unidad legible («2,4 MB»). */
+export const formatBytes = (bytes: number): string => {
+  if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  const exp = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+  const value = bytes / 1024 ** exp;
+  return `${value.toFixed(exp === 0 ? 0 : 1)} ${units[exp]}`;
+};
+
 export const formatCompact = (n: number): string => compactFormat.format(n);
 
 export const formatDate = (iso?: string | null): string => {

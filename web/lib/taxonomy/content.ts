@@ -106,8 +106,8 @@ function episodeToItem(episode: Episode): TaxonomyItem {
 function productToItem(product: Product): TaxonomyItem {
   const levelSlug = getLevel(slugify(product.level))?.slug;
   return {
-    id: `resource:${product.slug}`,
-    contentType: 'resource',
+    id: `product:${product.slug}`,
+    contentType: 'product',
     slug: product.slug,
     title: product.title,
     subtitle: product.subtitle,
@@ -246,7 +246,7 @@ export const getTag = (slug: string): { slug: string; name: string; count: numbe
 /** Counts por tipo de contenido para los índices. */
 export function getTypeCounts(): Record<ContentType, number> {
   const counts: Record<ContentType, number> = {
-    course: 0, blog: 0, podcast: 0, resource: 0, newsletter: 0,
+    course: 0, blog: 0, podcast: 0, product: 0, newsletter: 0,
   };
   for (const item of getPublicItems()) counts[item.contentType] += 1;
   return counts;
@@ -265,7 +265,7 @@ export function getFilterOptions() {
     categories: getCategoryGroupsWithCounts(),
     levels: getAllLevels(),
     audiences: getAllAudiencesWithCounts(),
-    types: (['course', 'blog', 'podcast', 'resource', 'newsletter'] as ContentType[]).filter(
+    types: (['course', 'blog', 'podcast', 'product', 'newsletter'] as ContentType[]).filter(
       (t) => items.some((i) => i.contentType === t)
     ),
     statuses: Array.from(statuses) as ContentStatus[],

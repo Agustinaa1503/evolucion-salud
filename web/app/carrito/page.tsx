@@ -142,8 +142,7 @@ export default function CarritoPage() {
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
           <p className="mt-3 text-center text-xs text-slate-500">
-            Demo local. En producción el pago se procesa con MercadoPago /
-            Hotmart.
+            Demo local. En producción el pago se procesa con MercadoPago.
           </p>
         </div>
       </div>

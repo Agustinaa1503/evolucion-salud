@@ -10,22 +10,28 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "db:sync-catalog": "tsx scripts/sync-catalog.mts",
-    "db:sync-taxonomy": "tsx scripts/sync-taxonomy.mts"
+    "db:sync-taxonomy": "tsx scripts/sync-taxonomy.mts",
+    "db:sync-content": "tsx scripts/sync-content.mts",
+    "db:sync-products": "tsx scripts/sync-products.mts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.48.1",
+    "diff": "^9.0.0",
     "framer-motion": "^12.43.0",
     "gray-matter": "^4.0.3",
+    "js-yaml": "^4.3.1",
     "lucide-react": "^0.474.0",
     "marked": "^18.0.7",
     "next": "^15.1.6",
     "pdf-lib": "^1.17.1",
     "qrcode": "^1.5.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@types/diff": "^7.0.2",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.10.7",
     "@types/qrcode": "^1.5.6",

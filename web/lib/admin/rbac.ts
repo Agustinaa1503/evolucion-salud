@@ -47,6 +47,8 @@ export type Permission =
   | 'admin.podcast.write'
   | 'admin.resources.read'
   | 'admin.resources.write'
+  | 'admin.orders.read'
+  | 'admin.orders.write'
   | 'admin.taxonomy.read'
   | 'admin.taxonomy.write'
   | 'admin.newsletter.read'
@@ -55,6 +57,8 @@ export type Permission =
   | 'admin.quizzes.read'
   | 'admin.certificates.read'
   | 'admin.certificates.write'
+  | 'admin.content.read'
+  | 'admin.content.write'
   | 'admin.settings.read'
   | 'admin.settings.write'
   | 'admin.logs.read';
@@ -73,6 +77,8 @@ export const ALL_PERMISSIONS: Permission[] = [
   'admin.podcast.write',
   'admin.resources.read',
   'admin.resources.write',
+  'admin.orders.read',
+  'admin.orders.write',
   'admin.taxonomy.read',
   'admin.taxonomy.write',
   'admin.newsletter.read',
@@ -81,6 +87,8 @@ export const ALL_PERMISSIONS: Permission[] = [
   'admin.quizzes.read',
   'admin.certificates.read',
   'admin.certificates.write',
+  'admin.content.read',
+  'admin.content.write',
   'admin.settings.read',
   'admin.settings.write',
   'admin.logs.read',
@@ -101,6 +109,8 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'admin.podcast.write',
     'admin.resources.read',
     'admin.resources.write',
+    'admin.orders.read',
+    'admin.orders.write',
     'admin.taxonomy.read',
     'admin.taxonomy.write',
     'admin.newsletter.read',
@@ -109,6 +119,8 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'admin.quizzes.read',
     'admin.certificates.read',
     'admin.certificates.write',
+    'admin.content.read',
+    'admin.content.write',
     'admin.settings.read',
     'admin.settings.write',
     'admin.logs.read',
@@ -129,6 +141,8 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'admin.waitlist.read',
     'admin.quizzes.read',
     'admin.certificates.read',
+    'admin.content.read',
+    'admin.content.write',
     'admin.logs.read',
   ],
   teacher: [
@@ -186,6 +200,10 @@ export const PERMISSION_GROUPS: {
       { permission: 'admin.podcast.write', label: 'Gestionar podcast', description: 'Publica y edita episodios.' },
       { permission: 'admin.resources.read', label: 'Ver recursos', description: 'Productos y descargables.' },
       { permission: 'admin.resources.write', label: 'Gestionar recursos', description: 'Publica y edita recursos.' },
+      { permission: 'admin.orders.read', label: 'Ver pedidos', description: 'Órdenes, pagos y licencias.' },
+      { permission: 'admin.orders.write', label: 'Gestionar pedidos', description: 'Revoca licencias y administra pedidos.' },
+      { permission: 'admin.content.read', label: 'Ver contenido', description: 'Accede al CMS de contenido.' },
+      { permission: 'admin.content.write', label: 'Gestionar contenido', description: 'Crea, edita y publica contenido.' },
       { permission: 'admin.taxonomy.read', label: 'Ver categorías y tags', description: 'Catálogo de clasificación.' },
       { permission: 'admin.taxonomy.write', label: 'Gestionar taxonomía', description: 'Crea y edita categorías y tags.' },
     ],

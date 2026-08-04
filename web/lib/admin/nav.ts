@@ -6,6 +6,7 @@ import {
   Award,
   BookOpen,
   ClipboardCheck,
+  FileEdit,
   FileText,
   LayoutDashboard,
   Mail,
@@ -13,6 +14,7 @@ import {
   Package,
   ScrollText,
   Settings,
+  ShoppingCart,
   Tag,
   Tags,
   UserRound,
@@ -42,14 +44,16 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     items: [
       { href: '/admin/usuarios', label: 'Usuarios', icon: Users, permission: 'admin.users.read' },
       { href: '/admin/cursos', label: 'Cursos', icon: BookOpen, permission: 'admin.courses.read' },
+      { href: '/admin/pedidos', label: 'Pedidos', icon: ShoppingCart, permission: 'admin.orders.read' },
     ],
   },
   {
     label: 'Contenido',
     items: [
+      { href: '/admin/contenido', label: 'Contenido', icon: FileEdit, permission: 'admin.content.read' },
       { href: '/admin/blog', label: 'Blog', icon: FileText, permission: 'admin.blog.read' },
       { href: '/admin/podcast', label: 'Podcast', icon: Mic, permission: 'admin.podcast.read' },
-      { href: '/admin/recursos', label: 'Recursos', icon: Package, permission: 'admin.resources.read' },
+      { href: '/admin/productos', label: 'Productos', icon: Package, permission: 'admin.resources.read' },
       { href: '/admin/categorias', label: 'Categorías', icon: Tags, permission: 'admin.taxonomy.read' },
       { href: '/admin/tags', label: 'Tags', icon: Tag, permission: 'admin.taxonomy.read' },
     ],

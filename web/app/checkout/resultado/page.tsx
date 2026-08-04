@@ -94,15 +94,14 @@ function Resultado() {
           ¡Pago aprobado!
         </h1>
         <p className="mt-3 max-w-md text-slate-600">
-          En los próximos minutos vas a recibir por email el acceso único a tus
-          descargables, ligado a tu correo y a tu Cuestionario Matriz PINE.
-          Revisá también la carpeta de spam.
+          Vas a recibir por email el enlace único a tus descargables. También
+          podés acceder en cualquier momento desde tu biblioteca personal.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Link href="/descarga-gratuita" className="btn-secondary">
-            Empezar con la checklist gratis
+          <Link href="/mi-biblioteca" className="btn-primary">
+            Ir a mi biblioteca
           </Link>
-          <Link href="/tienda" className="btn-primary">
+          <Link href="/tienda" className="btn-secondary">
             Seguir explorando la tienda
           </Link>
         </div>
