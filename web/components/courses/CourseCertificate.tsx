@@ -57,10 +57,10 @@ export default function CourseCertificate({ course }: Props) {
       <div className="rounded-2xl border border-sun-400/50 bg-sun-400/10 p-4">
         <p className="flex items-center gap-2 text-sm font-bold text-slate-800">
           <Award className="h-4 w-4 text-amber-600" aria-hidden="true" />
-          Certificado de participación
+          Certificado
         </p>
         <p className="mt-1 text-xs leading-relaxed text-slate-600">
-          Al completar la formación recibirá un certificado de participación de
+          Al completar la formación recibirá un certificado de
           Evolución Salud. Inicie sesión para descargarlo al terminar el curso.
         </p>
         <Link
@@ -79,7 +79,7 @@ export default function CourseCertificate({ course }: Props) {
       <div className="rounded-2xl border border-sun-400/50 bg-sun-400/10 p-4">
         <p className="flex items-center gap-2 text-sm font-bold text-slate-800">
           <Award className="h-4 w-4 text-amber-600" aria-hidden="true" />
-          Certificado de participación
+          Certificado
         </p>
         <p className="mt-1 text-xs leading-relaxed text-slate-600">
           Complete todas las lecciones para obtener su certificado. Progreso actual:{' '}
@@ -99,7 +99,7 @@ export default function CourseCertificate({ course }: Props) {
     <div className="rounded-2xl border border-leaf-300/60 bg-leaf-50 p-4">
       <p className="flex items-center gap-2 text-sm font-bold text-leaf-800">
         <Award className="h-4 w-4 text-leaf-600" aria-hidden="true" />
-        Certificado de participación
+        Certificado
       </p>
       <p className="mt-1 text-xs leading-relaxed text-leaf-700">
         ¡Felicitaciones! Completó el curso. Descargue su certificado en PDF con

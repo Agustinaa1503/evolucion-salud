@@ -8,6 +8,7 @@ import { PageHeader, Card, StatCard, Badge, Th, Td, EmptyState, ButtonLink } fro
 import AdminUrlFilters from '@/components/admin/AdminUrlFilters';
 import AdminPagination from '@/components/admin/AdminPagination';
 import ExportCsvButton from '@/components/admin/ExportCsvButton';
+import PreviewCertificateButton from '@/components/admin/PreviewCertificateButton';
 import { getAllCourses } from '@/lib/courses/registry';
 
 export const metadata: Metadata = { title: 'Certificados | BackOffice' };
@@ -62,9 +63,12 @@ export default async function AdminCertificadosPage({
         description="Certificados de participación emitidos (PDF + QR) con verificación pública en /verificar/[id]."
         badge={<Badge tone="sun">{formatCompact(count ?? 0)} emitidos</Badge>}
         actions={
-          sb && (data ?? []).length > 0 ? (
-            <ExportCsvButton filename="certificados" headers={['Número', 'Persona', 'Curso', 'Emisión']} rows={exportRows} />
-          ) : undefined
+          <div className="flex items-center gap-2">
+            <PreviewCertificateButton />
+            {sb && (data ?? []).length > 0 ? (
+              <ExportCsvButton filename="certificados" headers={['Número', 'Persona', 'Curso', 'Emisión']} rows={exportRows} />
+            ) : null}
+          </div>
         }
       />
 

@@ -131,3 +131,85 @@ describe('parser FASE 2', () => {
     expect(c.modules[0].lessons?.[0].platform).toBe('vimeo');
   });
 });
+
+describe('parser certificateConfig', () => {
+  const WITH_CERT = `---
+id: cert-test
+title: Curso con certificado
+description: Test
+type: free
+status: published
+hasCertificate: true
+certificateConfig:
+  enabled: true
+  signers:
+    - name: "Dr. Juan Pérez"
+      title: "Director Académico"
+      license: "Mat. MP 12345"
+    - name: "Lic. Ana García"
+      title: "Coordinadora"
+modules:
+  - title: Módulo 1
+---
+
+## Acerca de este curso
+Contenido.
+`;
+
+  const CERT_DEFAULTS = `---
+id: cert-defaults
+title: Curso cert defaults
+description: Test
+type: free
+status: published
+hasCertificate: true
+modules:
+  - title: Módulo 1
+---
+
+## Acerca de este curso
+Contenido.
+`;
+
+  const CERT_DISABLED = `---
+id: cert-disabled
+title: Curso cert disabled
+description: Test
+type: free
+status: published
+hasCertificate: false
+certificateConfig:
+  enabled: false
+  signers:
+    - name: "Ignorado"
+modules:
+  - title: Módulo 1
+---
+
+## Acerca de este curso
+Contenido.
+`;
+
+  it('parsea certificateConfig con signers personalizados', () => {
+    const c = parse(WITH_CERT);
+    expect(c.hasCertificate).toBe(true);
+    expect(c.certificateConfig).toBeDefined();
+    expect(c.certificateConfig?.enabled).toBe(true);
+    expect(c.certificateConfig?.signers).toHaveLength(2);
+    expect(c.certificateConfig?.signers?.[0].name).toBe('Dr. Juan Pérez');
+    expect(c.certificateConfig?.signers?.[0].title).toBe('Director Académico');
+    expect(c.certificateConfig?.signers?.[0].license).toBe('Mat. MP 12345');
+  });
+
+  it('certificateConfig es undefined cuando no se especifica', () => {
+    const c = parse(CERT_DEFAULTS);
+    expect(c.hasCertificate).toBe(true);
+    expect(c.certificateConfig).toBeUndefined();
+  });
+
+  it('certificateConfig disabled sin signers resulta en undefined', () => {
+    const c = parse(CERT_DISABLED);
+    expect(c.hasCertificate).toBe(false);
+    expect(c.certificateConfig).toBeUndefined();
+  });
+});

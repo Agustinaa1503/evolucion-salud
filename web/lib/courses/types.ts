@@ -161,6 +161,18 @@ export type CourseSEO = {
   ogType?: string;
 };
 
+/** Configuración de firmas profesionales para certificados. */
+export type CertificateSigner = {
+  name: string;
+  title?: string;
+  license?: string;
+};
+
+export type CertificateConfig = {
+  enabled: boolean;
+  signers?: CertificateSigner[];
+};
+
 /** Tipos de sección que el renderizador sabe mostrar. */
 export type CourseSectionType =
   | 'intro'
@@ -217,6 +229,7 @@ export type Course = {
   featured: boolean;
   hasQuiz: boolean;
   hasCertificate: boolean;
+  certificateConfig?: CertificateConfig;
   videos: CourseVideo[];
   resources: CourseResource[];
   modules: CourseModule[];
@@ -233,6 +246,8 @@ export type Course = {
   /** Icono y gradiente de marca (fallback visual). */
   icon: string;
   gradient: string;
+  /** Desbloqueo secuencial de módulos (FASE UX: Retención). */
+  sequential?: boolean;
 };
 
 export const isPublicCourse = (course: Course): boolean =>

@@ -158,7 +158,7 @@ export const products: Product[] = [
       'Manejo del estrés del equipo neuroquirúrgico',
       'Mapeo cortical: marco psicoeducativo',
     ],
-    includes: ['PDF técnico (90+ páginas)', 'Casos de aplicación', 'Plantilla de informe', 'Certificado de participación'],
+    includes: ['PDF técnico (90+ páginas)', 'Casos de aplicación', 'Plantilla de informe', 'Certificado'],
     icon: 'stethoscope',
     gradient: 'from-sky-600 to-indigo-700',
     image: "https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1600&q=80",

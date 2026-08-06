@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import {
   ArrowRight,
+  BookUser,
   GraduationCap,
   Heart,
   Library,
@@ -63,6 +64,7 @@ export default function Header() {
     'ES';
 
   const userLinks = [
+    { href: '/mi-cuenta', label: 'Mi cuenta', icon: BookUser },
     { href: '/mi-aprendizaje', label: 'Mi aprendizaje', icon: GraduationCap },
     { href: '/mi-biblioteca', label: 'Mi biblioteca', icon: Library },
     { href: '/mis-favoritos', label: 'Mis favoritos', icon: Heart },

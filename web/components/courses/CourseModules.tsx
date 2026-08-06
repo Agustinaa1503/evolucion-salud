@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   BookOpen,
   CheckCircle2,
@@ -13,11 +13,21 @@ import {
   Lock,
   PlayCircle,
   Sparkles,
+  Trophy,
   UserRound,
 } from 'lucide-react';
-import { countLessons, type Course, type CourseLesson } from '@/lib/courses/types';
+import { countLessons, isScoredQuiz, type Course, type CourseLesson } from '@/lib/courses/types';
 import { getCourseProgress, markLesson } from '@/lib/lms/actions';
-import type { CourseProgressData } from '@/lib/lms/progress';
+import {
+  detectMilestoneCrossings,
+  isModuleUnlocked,
+  type CourseProgressData,
+} from '@/lib/lms/progress';
+import {
+  confettiLessonComplete,
+  confettiMilestone,
+  confettiQuizPassed,
+} from '@/lib/lms/confetti';
 import CoursePlayer from './CoursePlayer';
 
 const lessonIcon: Record<CourseLesson['type'], typeof BookOpen> = {
@@ -32,8 +42,9 @@ const lessonIcon: Record<CourseLesson['type'], typeof BookOpen> = {
  * Programa del curso en módulos con sus lecciones.
  *
  * - Invitados: lista de solo lectura con enlaces (sin persistencia).
- * - Usuarios con sesión: barra de progreso, lecciones marcables y reproductor
- *   de YouTube embebido que reporta el avance real del video.
+ * - Usuarios con sesión: barra de progreso, lecciones marcables, reproductor
+ *   de YouTube embebido y micro-celebraciones al completar lecciones/hitos.
+ * - Si `course.sequential` es true, los módulos se desbloquean en orden.
  */
 export default function CourseModules({ course, className = '' }: { course: Course; className?: string }) {
   const [authed, setAuthed] = useState(false);
@@ -41,6 +52,7 @@ export default function CourseModules({ course, className = '' }: { course: Cour
   const [progress, setProgress] = useState<CourseProgressData | null>(null);
   const [openLessonKey, setOpenLessonKey] = useState<string | null>(null);
   const [busyKey, setBusyKey] = useState<string | null>(null);
+  const prevPctRef = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -49,21 +61,16 @@ export default function CourseModules({ course, className = '' }: { course: Cour
       setAuthed(result.authed);
       setProgress(result.progress);
       setReady(true);
+      if (result.progress) {
+        const total = countLessons(course);
+        const completed = Object.values(result.progress.lessons).filter((s) => s === 'completed').length;
+        prevPctRef.current = total > 0 ? Math.round((completed / total) * 100) : 0;
+      }
     });
     return () => {
       cancelled = true;
     };
   }, [course.slug]);
-
-  const lessonsByKey = useMemo(() => {
-    const map = new Map<string, { lesson: CourseLesson; moduleTitle: string }>();
-    for (const module of course.modules) {
-      for (const lesson of module.lessons ?? []) {
-        map.set(lesson.id, { lesson, moduleTitle: module.title });
-      }
-    }
-    return map;
-  }, [course.modules]);
 
   const completedCount = useMemo(() => {
     if (!progress) return 0;
@@ -73,12 +80,51 @@ export default function CourseModules({ course, className = '' }: { course: Cour
   const totalLessons = countLessons(course);
   const pct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
+  // Hitos de progreso para confetti
+  const milestoneRef = useRef<Set<number>>(new Set());
+  useEffect(() => {
+    if (!authed) return;
+    const crossings = detectMilestoneCrossings(prevPctRef.current, pct);
+    if (crossings.length > 0) {
+      for (const m of crossings) {
+        if (!milestoneRef.current.has(m)) {
+          milestoneRef.current.add(m);
+          void confettiMilestone(m);
+        }
+      }
+    }
+    prevPctRef.current = pct;
+  }, [pct, authed]);
+
+  // Set de lecciones completadas (para gating secuencial)
+  const completedLessonKeys = useMemo(() => {
+    if (!progress) return new Set<string>();
+    return new Set(
+      Object.entries(progress.lessons)
+        .filter(([, status]) => status === 'completed')
+        .map(([key]) => key)
+    );
+  }, [progress]);
+
+  // Set de lesson_keys de tipo quiz aprobados (para gating secuencial)
+  const passedQuizLessonKeys = useMemo(() => {
+    if (!progress) return new Set<string>();
+    // Por ahora, el quiz es global (no por módulo). Se extenderá con FASE futura.
+    return new Set<string>();
+  }, [progress]);
+
   const toggleLesson = useCallback(
-    async (lessonKey: string) => {
+    async (lessonKey: string, wasCompleted: boolean) => {
       if (!authed || busyKey) return;
       setBusyKey(lessonKey);
       const result = await markLesson(course.slug, lessonKey, 'completed');
-      if (result.ok && result.progress) setProgress(result.progress);
+      if (result.ok && result.progress) {
+        setProgress(result.progress);
+        // Micro-celebración al completar (no al desmarcar)
+        if (!wasCompleted) {
+          void confettiLessonComplete();
+        }
+      }
       setBusyKey(null);
     },
     [authed, busyKey, course.slug]
@@ -103,6 +149,7 @@ export default function CourseModules({ course, className = '' }: { course: Cour
           <h2 className="text-xl font-extrabold text-slate-900">Programa del curso</h2>
           <p className="text-xs font-medium text-slate-500">
             {course.modules.length} {course.modules.length === 1 ? 'módulo' : 'módulos'} · {totalLessons} lecciones
+            {course.sequential ? ' · Secuencial' : ''}
           </p>
         </div>
         {authed && totalLessons > 0 ? (
@@ -120,6 +167,12 @@ export default function CourseModules({ course, className = '' }: { course: Cour
                 aria-valuemax={100}
               />
             </div>
+            {pct === 100 ? (
+              <span className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold text-leaf-700">
+                <Trophy className="h-3 w-3" aria-hidden="true" />
+                ¡Completado!
+              </span>
+            ) : null}
           </div>
         ) : null}
       </div>
@@ -139,26 +192,52 @@ export default function CourseModules({ course, className = '' }: { course: Cour
       <div className="mt-6 space-y-4">
         {course.modules.map((module, i) => {
           const lessons = module.lessons ?? [];
+          const unlock = isModuleUnlocked(
+            i,
+            course.modules,
+            Boolean(course.sequential),
+            completedLessonKeys,
+            passedQuizLessonKeys
+          );
+          const isLocked = authed && !unlock.unlocked;
+
           return (
             <details
               key={module.id ?? module.title}
-              open={i === 0}
-              className="group rounded-3xl border border-slate-200/80 bg-white shadow-card transition hover:shadow-lift"
+              open={i === 0 && !isLocked}
+              className={`group rounded-3xl border bg-white shadow-card transition ${
+                isLocked
+                  ? 'border-slate-200/60 opacity-60'
+                  : 'border-slate-200/80 hover:shadow-lift'
+              }`}
+              onClick={isLocked ? (e) => e.preventDefault() : undefined}
             >
               <summary className="flex cursor-pointer list-none items-center gap-4 p-5 [&::-webkit-details-marker]:hidden">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-leaf-600 text-sm font-bold text-white shadow-sm">
-                  {i + 1}
+                <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-sm font-bold text-white shadow-sm ${
+                  isLocked
+                    ? 'bg-slate-400'
+                    : 'bg-gradient-to-br from-brand-500 to-leaf-600'
+                }`}>
+                  {isLocked ? <Lock className="h-4 w-4" aria-hidden="true" /> : i + 1}
                 </span>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-base font-extrabold text-slate-900">{module.title}</h3>
                   {module.description ? (
                     <p className="mt-0.5 text-xs font-medium leading-relaxed text-slate-500">{module.description}</p>
                   ) : null}
+                  {isLocked && unlock.reason ? (
+                    <p className="mt-1 flex items-center gap-1 text-xs font-medium text-slate-400">
+                      <Lock className="h-3 w-3 shrink-0" aria-hidden="true" />
+                      {unlock.reason}
+                    </p>
+                  ) : null}
                 </div>
                 <span className="shrink-0 text-xs font-bold text-slate-400">{lessons.length}</span>
-                <ChevronDown className="h-5 w-5 shrink-0 text-slate-400 transition group-open:rotate-180" aria-hidden="true" />
+                {!isLocked ? (
+                  <ChevronDown className="h-5 w-5 shrink-0 text-slate-400 transition group-open:rotate-180" aria-hidden="true" />
+                ) : null}
               </summary>
-              {lessons.length ? (
+              {lessons.length && !isLocked ? (
                 <ul className="border-t border-slate-100 px-5 py-4">
                   {lessons.map((lesson, j) => {
                     const Icon = lessonIcon[lesson.type] ?? BookOpen;
@@ -174,7 +253,7 @@ export default function CourseModules({ course, className = '' }: { course: Cour
                           {authed ? (
                             <button
                               type="button"
-                              onClick={() => void toggleLesson(lesson.id)}
+                              onClick={() => void toggleLesson(lesson.id, isCompleted)}
                               disabled={busyKey === lesson.id}
                               title={isCompleted ? 'Marcar como pendiente' : 'Marcar como completada'}
                               className="mt-1.5 shrink-0 text-slate-300 transition hover:text-brand-600 disabled:opacity-50"
@@ -239,7 +318,10 @@ export default function CourseModules({ course, className = '' }: { course: Cour
                               onCompleted={() => {
                                 void (async () => {
                                   const result = await markLesson(course.slug, lesson.id, 'completed');
-                                  if (result.ok && result.progress) setProgress(result.progress);
+                                  if (result.ok && result.progress) {
+                                    setProgress(result.progress);
+                                    void confettiLessonComplete();
+                                  }
                                 })();
                               }}
                             />

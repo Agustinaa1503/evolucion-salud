@@ -235,7 +235,7 @@ export const products: Product[] = [
       "PDF técnico (90+ páginas)",
       "Casos de aplicación",
       "Plantilla de informe",
-      "Certificado de participación"
+      "Certificado"
     ],
     "icon": "stethoscope",
     "gradient": "from-sky-600 to-indigo-700",

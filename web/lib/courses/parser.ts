@@ -5,6 +5,8 @@ import yaml from 'js-yaml';
 import { marked } from 'marked';
 import type {
   BibliographyEntry,
+  CertificateConfig,
+  CertificateSigner,
   Course,
   CourseLesson,
   CourseModule,
@@ -265,6 +267,29 @@ const parseQuiz = (v: unknown): Quiz | undefined => {
           : undefined,
     questions,
   };
+};
+
+const parseCertificateSigners = (v: unknown): CertificateSigner[] | undefined => {
+  if (!Array.isArray(v) || v.length === 0) return undefined;
+  return v.map((item): CertificateSigner | null => {
+    const o = asObject(item);
+    const name = asString(o.name);
+    if (!name) return null;
+    return {
+      name,
+      title: asString(o.title) || undefined,
+      license: asString(o.license) || undefined,
+    };
+  }).filter((x): x is CertificateSigner => x !== null);
+};
+
+const parseCertificateConfig = (v: unknown): CertificateConfig | undefined => {
+  if (v === undefined || v === null) return undefined;
+  const o = asObject(v);
+  const enabled = asBoolean(o.enabled, true);
+  if (!enabled) return undefined;
+  const signers = parseCertificateSigners(o.signers);
+  return { enabled, signers };
 };
 
 const parseFaq = (v: unknown): FaqItem[] => {
@@ -533,6 +558,7 @@ export function parseCourseFile(filePath: string): Course {
     featured: asBoolean(d.featured, false),
     hasQuiz: quiz !== undefined || asBoolean(d.hasQuiz, false),
     hasCertificate: asBoolean(d.hasCertificate, false),
+    certificateConfig: parseCertificateConfig(d.certificateConfig ?? d.certificate_config),
     videos,
     resources,
     modules,
@@ -546,5 +572,6 @@ export function parseCourseFile(filePath: string): Course {
     sections,
     icon: asString(d.icon, 'book'),
     gradient: asString(d.gradient, 'from-brand-500 to-leaf-600'),
+    sequential: asBoolean(d.sequential, false),
   };
 }

@@ -25,6 +25,11 @@ const COURSES_DIR =
 
 let cache: { signature: string; courses: Course[] } | null = null;
 
+/** Invalida la caché del registro (llamar tras escribir/eliminar un .md). */
+export function clearCourseCache(): void {
+  cache = null;
+}
+
 function dirSignature(): string {
   const entries = fs.readdirSync(COURSES_DIR, { withFileTypes: true });
   return entries

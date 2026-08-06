@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { BookOpen, ClipboardCheck, Award, FileText, Clock, ListChecks } from 'lucide-react';
+import { BookOpen, ClipboardCheck, Award, FileText, Clock, ListChecks, Pencil } from 'lucide-react';
 import { requireAdminRole } from '@/lib/auth/session';
 import { adminDb } from '@/lib/admin/data';
 import { formatDate, formatCompact } from '@/lib/admin/format';
 import { PageHeader, Card, StatCard, Badge, StatusBadge, Th, Td, EmptyState, ButtonLink } from '@/components/admin/ui';
+import PreviewCertificateButton from '@/components/admin/PreviewCertificateButton';
 import { getCourse } from '@/lib/courses/registry';
 
 export const metadata: Metadata = { title: 'Detalle de curso | BackOffice' };
@@ -53,7 +54,15 @@ export default async function AdminCourseDetailPage({
             <StatusBadge estado={course.status} />
           </span>
         }
-        actions={<ButtonLink href="/admin/cursos">← Cursos</ButtonLink>}
+        actions={
+          <div className="flex items-center gap-2">
+            <ButtonLink href={`/admin/cursos/${course.slug}/editar`} variant="primary">
+              <Pencil className="h-4 w-4" aria-hidden="true" /> Editar programa
+            </ButtonLink>
+            {course.hasCertificate ? <PreviewCertificateButton slug={course.slug} /> : null}
+            <ButtonLink href="/admin/cursos">← Cursos</ButtonLink>
+          </div>
+        }
       />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

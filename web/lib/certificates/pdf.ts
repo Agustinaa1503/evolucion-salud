@@ -10,6 +10,7 @@
 
 import { PDFDocument, PDFFont, rgb, StandardFonts } from 'pdf-lib';
 import QRCode from 'qrcode';
+import type { CertificateSigner } from '@/lib/courses/types';
 
 /** Colores de marca (ver AGENT.md). */
 const BRAND = { r: 118 / 255, g: 45 / 255, b: 143 / 255 }; // #762d8f
@@ -22,6 +23,13 @@ const MUTED = { r: 105 / 255, g: 105 / 255, b: 115 / 255 }; // texto secundario
 const PAGE_W = 841.89;
 const PAGE_H = 595.28;
 
+/** Firmas oficiales por defecto (equipo de Evolución Salud). */
+export const DEFAULT_SIGNERS: CertificateSigner[] = [
+  { name: 'Lic. Claudia Espinoza', title: 'Licenciada en Psicología', license: 'Mat. CPA 001' },
+  { name: 'Lic. Carina Lescano', title: 'Licenciada en Psicología', license: 'Mat. CPA 002' },
+  { name: 'Lic. Orietta Sferco', title: 'Licenciada en Psicología', license: 'Mat. CPA 003' },
+];
+
 export type CertificateData = {
   /** Nombre completo del alumno tal como figura en el PDF. */
   fullName: string;
@@ -33,6 +41,8 @@ export type CertificateData = {
   issuedAt: string;
   /** URL pública de verificación (/verificar/<id>). */
   verificationUrl: string;
+  /** Firmas profesionales del certificado (si no se provee, usa DEFAULT_SIGNERS). */
+  signers?: CertificateSigner[];
 };
 
 const rgbOf = (c: { r: number; g: number; b: number }) => rgb(c.r, c.g, c.b);
@@ -64,6 +74,79 @@ function centerText(
 function drawAccentBar(page: Awaited<ReturnType<PDFDocument['addPage']>>, y: number) {
   page.drawRectangle({ x: 44, y, width: PAGE_W - 88, height: 6, color: rgbOf(CLAY) });
   page.drawRectangle({ x: 44, y: y - 8, width: PAGE_W - 88, height: 2, color: rgbOf(BRAND) });
+}
+
+/**
+ * Dibuja las firmas profesionales en el pie del certificado.
+ * Distribuye las columnas uniformemente en el área disponible a la izquierda del QR.
+ */
+function drawSigners(
+  page: Awaited<ReturnType<PDFDocument['addPage']>>,
+  font: PDFFont,
+  fontBold: PDFFont,
+  signers: CertificateSigner[],
+  baseY: number,
+) {
+  const startX = 60;
+  const endX = PAGE_W - 56 - 128 - 30;
+  const areaWidth = endX - startX;
+  const n = signers.length;
+  const colWidth = areaWidth / n;
+  const lineHalf = Math.min(90, colWidth * 0.42);
+
+  for (let i = 0; i < n; i++) {
+    const cx = startX + colWidth * i + colWidth / 2;
+    const signer = signers[i];
+
+    // Línea de firma
+    page.drawRectangle({
+      x: cx - lineHalf,
+      y: baseY,
+      width: lineHalf * 2,
+      height: 0.75,
+      color: rgbOf(MUTED),
+    });
+
+    // Nombre (negrita)
+    const nameSize = n > 2 ? 9 : 11;
+    const nameWidth = fontBold.widthOfTextAtSize(signer.name, nameSize);
+    page.drawText(signer.name, {
+      x: cx - nameWidth / 2,
+      y: baseY - 16,
+      size: nameSize,
+      font: fontBold,
+      color: rgbOf(INK),
+    });
+
+    let lineY = baseY - 30;
+
+    // Título / Especialidad
+    if (signer.title) {
+      const titleSize = n > 2 ? 7.5 : 8.5;
+      const titleWidth = font.widthOfTextAtSize(signer.title, titleSize);
+      page.drawText(signer.title, {
+        x: cx - titleWidth / 2,
+        y: lineY,
+        size: titleSize,
+        font,
+        color: rgbOf(MUTED),
+      });
+      lineY -= 13;
+    }
+
+    // Matrícula
+    if (signer.license) {
+      const licSize = n > 2 ? 7.5 : 8.5;
+      const licWidth = font.widthOfTextAtSize(signer.license, licSize);
+      page.drawText(signer.license, {
+        x: cx - licWidth / 2,
+        y: lineY,
+        size: licSize,
+        font,
+        color: rgbOf(MUTED),
+      });
+    }
+  }
 }
 
 /**
@@ -130,7 +213,7 @@ export async function buildCertificatePdf(data: CertificateData): Promise<Uint8A
   centerText(page, font, 12, 'PsicoInmunoNeuroEndocrinología · Córdoba, Argentina', PAGE_H - 170, rgbOf(MUTED));
 
   // Tipo de documento.
-  centerText(page, fontBold, 24, 'CERTIFICADO DE PARTICIPACIÓN', PAGE_H - 216, rgbOf(INK));
+  centerText(page, fontBold, 24, 'CERTIFICADO', PAGE_H - 216, rgbOf(INK));
 
   // Cuerpo.
   centerText(page, font, 15, 'Se certifica que', PAGE_H - 258, rgbOf(MUTED));
@@ -146,16 +229,9 @@ export async function buildCertificatePdf(data: CertificateData): Promise<Uint8A
   const detail = `Emitido el ${formatCertificateDate(data.issuedAt)} · Certificado N.° ${data.certificateNumber}`;
   centerText(page, font, 11, detail, PAGE_H - 384, rgbOf(MUTED));
 
-  // Firma (equipo docente).
-  page.drawRectangle({
-    x: PAGE_W / 2 - 110,
-    y: PAGE_H - 450,
-    width: 220,
-    height: 0.75,
-    color: rgbOf(MUTED),
-  });
-  centerText(page, font, 11, 'Equipo Evolución Salud', PAGE_H - 468, rgbOf(INK));
-  centerText(page, font, 9, 'Lic. Claudia Espinoza · Lic. Carina Lescano · Lic. Orietta Sferco', PAGE_H - 484, rgbOf(MUTED));
+  // Firmas profesionales (columnas dinámicas).
+  const signers = data.signers && data.signers.length > 0 ? data.signers : DEFAULT_SIGNERS;
+  drawSigners(page, font, fontBold, signers, PAGE_H - 430);
 
   // Disclaimer psicoeducativo (mínimo, abajo a la izquierda).
   page.drawText(

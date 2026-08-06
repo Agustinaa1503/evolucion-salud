@@ -75,7 +75,7 @@ export default async function VerificarPage({ params }: Props) {
                 </span>
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                    Certificado de participación
+                    Certificado
                   </p>
                   <p className="text-lg font-extrabold text-slate-900">{data.course_title}</p>
                 </div>

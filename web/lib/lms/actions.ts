@@ -670,6 +670,7 @@ export async function getCourseCertificate(courseSlug: string): Promise<Certific
       certificateNumber: cert.certificate_number,
       issuedAt: cert.issued_at,
       verificationUrl,
+      signers: course.certificateConfig?.signers,
     });
 
     const { error: uploadError } = await supabase.storage
